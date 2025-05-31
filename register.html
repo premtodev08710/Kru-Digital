@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>สมัครสมาชิก - ระบบจัดการชั้นเรียน</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <style>
+    :root {
+      --primary-color: #4caf50;
+      --secondary-color: #2196f3;
+      --accent-color: #ffc107;
+      --danger-color: #f44336;
+      --text-color: #333;
+      --light-text-color: #666;
+      --background-color: #f0f2f5;
+      --card-background: #ffffff;
+      --border-color: #e0e0e0;
+      --hover-light: #e3f2fd;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Sarabun", sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .register-container {
+      background-color: var(--card-background);
+      padding: 40px 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .register-container h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 1.8rem;
+      color: var(--secondary-color);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .form-group input:focus {
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+      outline: none;
+    }
+
+    .btn-register {
+      width: 100%;
+      background-color: var(--primary-color);
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-register:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+    }
+
+    .error-message {
+      color: var(--danger-color);
+      font-size: 0.9rem;
+      margin-top: 10px;
+      text-align: center;
+      display: none;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 36px;
+      font-size: 1.2rem;
+      color: var(--light-text-color);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .register-footer {
+      margin-top: 25px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--light-text-color);
+    }
+
+    .register-footer a {
+      color: var(--secondary-color);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .register-footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      .register-container {
+        padding: 30px 20px;
+      }
+      .register-container h1 {
+        font-size: 1.6rem;
+      }
+      .btn-register {
+        padding: 10px;
+        font-size: 1rem;
+      }
+    }
+  </style>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+</head>
+<body>
+  <div class="register-container">
+    <h1>สมัครสมาชิก</h1>
+
+    <div class="form-group">
+      <label for="regEmail">อีเมล</label>
+      <input type="email" id="regEmail" placeholder="กรอกอีเมลของคุณ" required />
+    </div>
+
+    <div class="form-group input-wrapper">
+      <label for="regPassword">รหัสผ่าน</label>
+      <input
+        type="password"
+        id="regPassword"
+        placeholder="กรอกรหัสผ่าน (อย่างน้อย 6 ตัวอักษร)"
+        required
+      />
+      <span id="toggleRegPassword" class="password-toggle material-icons"
+        >visibility</span
+      >
+    </div>
+
+    <div class="form-group input-wrapper">
+      <label for="regConfirmPassword">ยืนยันรหัสผ่าน</label>
+      <input
+        type="password"
+        id="regConfirmPassword"
+        placeholder="พิมพ์รหัสผ่านอีกครั้ง"
+        required
+      />
+      <span id="toggleRegConfirm" class="password-toggle material-icons"
+        >visibility</span
+      >
+    </div>
+
+    <button class="btn-register" id="btnRegister">
+      <span class="material-icons">person_add</span>
+      สมัครสมาชิก
+    </button>
+
+    <p class="error-message" id="regErrorMessage"></p>
+
+    <div class="register-footer">
+      <span>กลับไปหน้า </span><a href="login.html">เข้าสู่ระบบ</a>
+    </div>
+  </div>
+
+  <script>
+    // Firebase Configuration (ปรับเป็นของคุณ)
+    const firebaseConfig = {
+      apiKey: "AIzaSyBCq_MGUYJeLsCrxsNSrANAAFG3KuZKvF8",
+      authDomain: "school-7e137.firebaseapp.com",
+      databaseURL: "https://school-7e137-default-rtdb.firebaseio.com",
+      projectId: "school-7e137",
+      storageBucket: "school-7e137.appspot.com",
+      messagingSenderId: "78922863421",
+      appId: "1:78922863421:web:f90ed44cb88838dd6deb54",
+    };
+
+    // Initialize Firebase
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+
+    const regEmail = document.getElementById("regEmail");
+    const regPassword = document.getElementById("regPassword");
+    const regConfirmPassword = document.getElementById("regConfirmPassword");
+    const btnRegister = document.getElementById("btnRegister");
+    const regErrorMessage = document.getElementById("regErrorMessage");
+
+    const toggleRegPassword = document.getElementById("toggleRegPassword");
+    const toggleRegConfirm = document.getElementById("toggleRegConfirm");
+
+    // สลับการแสดง/ซ่อนรหัสผ่านหลัก
+    toggleRegPassword.addEventListener("click", () => {
+      const type =
+        regPassword.getAttribute("type") === "password" ? "text" : "password";
+      regPassword.setAttribute("type", type);
+      toggleRegPassword.textContent =
+        type === "password" ? "visibility" : "visibility_off";
+    });
+
+    // สลับการแสดง/ซ่อนรหัสผ่านยืนยัน
+    toggleRegConfirm.addEventListener("click", () => {
+      const type =
+        regConfirmPassword.getAttribute("type") === "password"
+          ? "text"
+          : "password";
+      regConfirmPassword.setAttribute("type", type);
+      toggleRegConfirm.textContent =
+        type === "password" ? "visibility" : "visibility_off";
+    });
+
+    // ฟังก์ชันสมัครสมาชิก
+    btnRegister.addEventListener("click", (e) => {
+      e.preventDefault();
+      const email = regEmail.value.trim();
+      const password = regPassword.value;
+      const confirmPassword = regConfirmPassword.value;
+
+      regErrorMessage.style.display = "none";
+
+      // ตรวจสอบข้อมูลเบื้องต้น
+      if (!email || !password || !confirmPassword) {
+        regErrorMessage.textContent = "กรุณากรอกข้อมูลทุกช่องให้ครบ";
+        regErrorMessage.style.display = "block";
+        return;
+      }
+      if (password.length < 6) {
+        regErrorMessage.textContent = "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร";
+        regErrorMessage.style.display = "block";
+        return;
+      }
+      if (password !== confirmPassword) {
+        regErrorMessage.textContent = "รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน";
+        regErrorMessage.style.display = "block";
+        return;
+      }
+
+      // เรียก Firebase สร้างบัญชีใหม่
+      auth
+        .createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          // สมัครสมาชิกสำเร็จแล้ว จะล็อกอินให้อัตโนมัติ
+          // เปลี่ยนเส้นทางไปยังหน้า index.html (หรือหน้าอื่นตามต้องการ)
+          window.location.href = "index.html";
+        })
+        .catch((error) => {
+          // แสดงข้อความผิดพลาด
+          let msg = "";
+          switch (error.code) {
+            case "auth/invalid-email":
+              msg = "รูปแบบอีเมลไม่ถูกต้อง";
+              break;
+            case "auth/email-already-in-use":
+              msg = "อีเมลนี้มีผู้ใช้งานแล้ว";
+              break;
+            case "auth/weak-password":
+              msg = "รหัสผ่านควรมีอย่างน้อย 6 ตัวอักษร";
+              break;
+            default:
+              msg = "เกิดข้อผิดพลาด: " + error.message;
+          }
+          regErrorMessage.textContent = msg;
+          regErrorMessage.style.display = "block";
+        });
+    });
+
+    // ถ้ามีการล็อกอินค้างไว้ ให้ไปหน้า index.html ทันที
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        window.location.href = "index.html";
+      }
+    });
+  </script>
+</body>
+</html>

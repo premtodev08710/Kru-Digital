@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>มอบหมายงาน - ระบบจัดการชั้นเรียน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+    <style>
+        /* CSS Variables for consistent theming */
+        :root {
+            --primary-color: #4CAF50; /* Green */
+            --secondary-color: #2196F3; /* Blue */
+            --accent-color: #FFC107; /* Amber/Yellow */
+            --danger-color: #f44336; /* Red */
+            --text-color: #333;
+            --light-text-color: #666;
+            --background-color: #f0f2f5;
+            --card-background: #ffffff;
+            --border-color: #e0e0e0;
+            --hover-light: #e3f2fd;
+            --sidebar-bg: #2c3e50; /* Dark blue-gray */
+            --sidebar-text: #ecf0f1; /* Light gray */
+            --sidebar-active-bg: #34495e; /* Slightly lighter dark */
+            --sidebar-hover-bg: #3a536b;
+            --button-blue: #2196F3;
+            --button-blue-hover: #1976D2;
+            --button-red-delete: #d32f2f;
+            --button-red-delete-hover: #c62828;
+        }
+
+        /* Basic body styling and flex container for sidebar and main content */
+        body {
+            font-family: 'Sarabun', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- Left Sidebar Styling --- */
+        .sidebar {
+            width: 250px;
+            background-color: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .sidebar .logo-section {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 30px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar .logo-icon {
+            font-size: 2.2rem;
+            color: var(--primary-color);
+            margin-right: 10px;
+        }
+
+        .sidebar .logo-text {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--sidebar-text);
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .sidebar nav ul li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            border-radius: 8px;
+            margin: 0 10px;
+        }
+
+        .sidebar nav ul li a .material-icons {
+            margin-right: 15px;
+            font-size: 1.5rem;
+        }
+
+        .sidebar nav ul li a:hover {
+            background-color: var(--sidebar-hover-bg);
+        }
+
+        .sidebar nav ul li a.active {
+            background-color: var(--sidebar-active-bg);
+            color: var(--primary-color);
+            box-shadow: inset 3px 0 0 var(--primary-color);
+        }
+
+        .sidebar .bottom-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 20px;
+            margin: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar .bottom-button .material-icons {
+            margin-right: 10px;
+            font-size: 1.6rem;
+        }
+
+        .sidebar .bottom-button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        /* --- Main Content Layout --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* --- Assignment Form Section Styling --- */
+        .assignment-form-section {
+            background-color: var(--card-background);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .assignment-form-section h2 {
+            color: var(--secondary-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .assignment-form-section .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .assignment-form-section .form-row > div {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .assignment-form-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .assignment-form-section input[type="text"],
+        .assignment-form-section input[type="number"] {
+            width: calc(100% - 24px);
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .assignment-form-section input:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+            outline: none;
+        }
+
+        .assignment-form-section .add-assignment-button {
+            background-color: var(--button-blue);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 10px;
+            display: block;
+            width: fit-content;
+        }
+        .assignment-form-section .add-assignment-button:hover {
+            background-color: var(--button-blue-hover);
+            transform: translateY(-2px);
+        }
+        
+        /* --- Assignment Table Section Styling --- */
+        .assignment-table-section {
+            background-color: var(--card-background);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            overflow-x: auto; /* Enable horizontal scrolling for wide tables */
+        }
+
+        .assignment-table-section h2 {
+            color: var(--secondary-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .score-table-container {
+            max-height: 600px; /* Limit height for vertical scrolling */
+            overflow-y: auto;
+        }
+
+        .score-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px; /* Ensure table has minimum width for many columns */
+        }
+
+        .score-table th, .score-table td {
+            text-align: left;
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap; /* Prevent text wrapping in headers */
+        }
+
+        .score-table th {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .score-table tbody tr:hover {
+            background-color: var(--hover-light);
+        }
+
+        /* ช่อง input สำหรับคะแนน */
+        .score-table td input[type="number"] {
+            width: 70px; /* Fixed width for score input fields */
+            padding: 6px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            text-align: center;
+            -moz-appearance: textfield; /* Hide arrows on Firefox */
+        }
+        /* Hide arrows on Chrome, Safari, Edge */
+        .score-table td input[type="number"]::-webkit-outer-spin-button,
+        .score-table td input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        /* เมื่อแสดงคะแนน weighted ให้ไม่สามารถแก้ไขได้ */
+        .score-table td input[type="number"].disabled-weighted {
+            background-color: #f5f5f5;
+            color: var(--light-text-color);
+            cursor: not-allowed;
+        }
+
+        .score-table .student-name-col {
+            font-weight: 600;
+            color: var(--text-color);
+            min-width: 150px;
+        }
+        .score-table .score-total-col {
+            font-weight: 700;
+            color: var(--secondary-color);
+            text-align: right;
+            padding-right: 15px;
+        }
+        .score-table .assignment-name-header {
+            cursor: default;
+            position: relative;
+            padding-right: 30px; /* Space for delete icon */
+        }
+        .score-table .assignment-name-header .delete-assignment-icon {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            color: var(--danger-color);
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .score-table .assignment-name-header:hover .delete-assignment-icon {
+            opacity: 1;
+        }
+
+        /* --- Responsive Adjustments --- */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                padding: 15px 0;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+            .sidebar .logo-section {
+                padding-bottom: 15px;
+                margin-bottom: 15px;
+                justify-content: center;
+            }
+            .sidebar nav ul {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 5px;
+            }
+            .sidebar nav ul li {
+                flex: 1 1 auto;
+                max-width: 150px;
+            }
+            .sidebar nav ul li a {
+                padding: 10px 15px;
+                margin: 0 5px;
+                justify-content: center;
+                flex-direction: column;
+                font-size: 0.85rem;
+            }
+            .sidebar nav ul li a .material-icons {
+                margin-right: 0;
+                margin-bottom: 5px;
+            }
+            .sidebar nav ul li a.active {
+                box-shadow: inset 0 -3px 0 var(--primary-color);
+            }
+            .sidebar .bottom-button {
+                margin: 15px;
+                font-size: 0.9rem;
+            }
+
+            .main-content {
+                padding: 20px;
+                gap: 20px;
+            }
+            .assignment-form-section,
+            .assignment-table-section {
+                padding: 20px;
+            }
+            .assignment-form-section h2,
+            .assignment-table-section h2 {
+                font-size: 1.5rem;
+            }
+            .assignment-form-section .form-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .assignment-form-section .form-row > div {
+                min-width: unset;
+                width: 100%;
+            }
+            .assignment-form-section .add-assignment-button {
+                width: 100%;
+            }
+            .score-table {
+                min-width: 500px; /* Adjust min-width for mobile */
+            }
+            .score-table th, .score-table td {
+                padding: 8px 5px;
+                font-size: 0.85rem;
+            }
+            .score-table td input[type="number"] {
+                width: 60px;
+                padding: 4px;
+            }
+            .score-table .student-name-col {
+                min-width: 100px;
+            }
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo-section">
+            <span class="material-icons logo-icon">menu_book</span>
+            <span class="logo-text">ระบบจัดการชั้นเรียน</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html"><span class="material-icons">home</span>หน้าแรก</a></li>
+                <li><a href="#" ><span class="material-icons">school</span>ห้องเรียน</a></li>
+                <li><a href="#" ><span class="material-icons">assignment</span>มอบหมายงาน</a></li>
+                <li><a href="#"><span class="material-icons">event_note</span>ข้อมูลการเข้าเรียน</a></li>
+                <li><a href="summary.html" class="active"><span class="material-icons">bar_chart</span>คะแนนรวม</a></li>
+            </ul>
+        </nav>
+        <a href="index.html" class="bottom-button">
+            <span class="material-icons">add_circle</span>
+            หน้าหลัก
+        </a>
+    </div>
+
+    <div class="main-content">
+        <div class="assignment-form-section">
+            <h2>เพิ่มงานใหม่</h2>
+            <form id="assignmentForm">
+                <div class="form-row">
+                    <div>
+                        <label for="assignmentName">ชื่อหัวข้องาน:</label>
+                        <input type="text" id="assignmentName" placeholder="เช่น การบ้านบทที่ 1" required>
+                    </div>
+                    <div>
+                        <label for="assignmentMaxScore">คะแนนเต็มเดิม:</label>
+                        <input type="number" id="assignmentMaxScore" min="0" value="10" required>
+                    </div>
+                </div>
+                <button type="submit" class="add-assignment-button">เพิ่มงาน</button>
+            </form>
+        </div>
+
+        <div class="assignment-table-section">
+            <h2>ตารางคะแนนงาน (แสดงสัดส่วน)</h2>
+            <div class="score-table-container">
+                <table class="score-table">
+                    <thead>
+                        <tr id="scoreTableHeaderRow">
+                            <!-- Dynamic Headers -->
+                        </tr>
+                    </thead>
+                    <tbody id="scoreTableBody">
+                        <tr><td colspan="4" style="text-align: center; color: var(--light-text-color);">กำลังโหลดข้อมูลนักเรียนและงาน...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase configuration (ปรับเป็นของคุณ)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBCq_MGUYJeLsCrxsNSrANAAFG3KuZKvF8",
+            authDomain: "school-7e137.firebaseapp.com",
+            databaseURL: "https://school-7e137-default-rtdb.firebaseio.com",
+            projectId: "school-7e137",
+            storageBucket: "school-7e137.appspot.com",
+            messagingSenderId: "78922863421",
+            appId: "1:78922863421:web:f90ed44cb88838dd6deb54",
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.database();
+
+        let currentClassId = '';
+        let studentsData = {};      // { studentId: { firstName, lastName, studentNo } }
+        let assignmentsData = {};   // { assignmentId: { name, maxScore, weightScore, createdAt } }
+        let studentScores = {};     // { studentId: { assignmentId: score, specialScore: score } }
+
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            currentClassId = urlParams.get('class') || '';
+
+            if (!currentClassId) {
+                alert('ไม่พบ Class ID กรุณาเลือกห้องเรียนจากหน้าหลัก');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // ปรับลิงก์ใน Sidebar ให้มี ?class={currentClassId}
+            document.querySelectorAll('.sidebar nav ul li a').forEach(link => {
+                const text = link.textContent.trim();
+                if (text.includes('ห้องเรียน')) {
+                    link.href = `class_management.html?class=${currentClassId}`;
+                } else if (text.includes('มอบหมายงาน')) {
+                    link.href = `assignments.html?class=${currentClassId}`;
+                } else if (text.includes('ข้อมูลการเข้าเรียน')) {
+                    link.href = `attendance.html?class=${currentClassId}`;
+                } else if (text.includes('คะแนนรวม')) {
+                    link.href = `summary.html?class=${currentClassId}`;
+                }
+                // หน้าแรกไม่ต้องเพิ่ม class param
+            });
+
+            // โหลดข้อมูลทั้งหมด
+            loadAllData(currentClassId);
+
+            // ตั้ง event สำหรับฟอร์มเพิ่มงาน
+            document.getElementById('assignmentForm').addEventListener('submit', addAssignment);
+        };
+
+        /**
+         * โหลดข้อมูลนักเรียน, งาน, และคะแนน จาก Firebase แล้วเรียก renderScoreTable ทุกครั้งที่มีการเปลี่ยนแปลง
+         * @param {string} classId 
+         */
+        function loadAllData(classId) {
+            // โหลดนักเรียน
+            db.ref(`classes/${classId}/students`).on('value', snapshot => {
+                studentsData = snapshot.val() || {};
+                console.log("Students Data:", studentsData);
+                renderScoreTable();
+            }, error => console.error("Error loading students:", error));
+
+            // โหลดงาน
+            db.ref(`classes/${classId}/assignments`).on('value', snapshot => {
+                assignmentsData = snapshot.val() || {};
+                console.log("Assignments Data:", assignmentsData);
+
+                // กำหนดค่า default weightScore = maxScore ถ้าไม่มี field นั้น
+                Object.entries(assignmentsData).forEach(([aid, assign]) => {
+                    if (assign.weightScore === undefined) {
+                        assignmentsData[aid].weightScore = assign.maxScore;
+                        // อัปเดตกลับไปที่ Firebase (ถ้าต้องการ)
+                        // db.ref(`classes/${classId}/assignments/${aid}/weightScore`).set(assign.maxScore);
+                    }
+                });
+
+                renderScoreTable();
+            }, error => console.error("Error loading assignments:", error));
+
+            // โหลดคะแนน
+            db.ref(`classes/${classId}/scores`).on('value', snapshot => {
+                studentScores = snapshot.val() || {};
+                console.log("Student Scores Data:", studentScores);
+                renderScoreTable();
+            }, error => console.error("Error loading scores:", error));
+        }
+
+        /**
+         * สร้างตารางคะแนน (รวมสัดส่วน) ใหม่ทุกครั้งที่ข้อมูลใด ๆ เปลี่ยน
+         */
+        function renderScoreTable() {
+            const headerRow = document.getElementById('scoreTableHeaderRow');
+            const tableBody = document.getElementById('scoreTableBody');
+
+            // ล้าง header และ body เดิม
+            headerRow.innerHTML = '';
+            tableBody.innerHTML = '';
+
+            // --- สร้าง Header ---
+            // แสดงชื่อคอลัมน์ "ชื่อนักเรียน"
+            const thName = document.createElement('th');
+            thName.textContent = 'ชื่อนักเรียน';
+            headerRow.appendChild(thName);
+
+            // เรียกดู assignment IDs แล้วเรียงตาม createdAt
+            const sortedAssignmentIds = Object.keys(assignmentsData).sort((a, b) => {
+                const dateA = new Date(assignmentsData[a].createdAt || 0);
+                const dateB = new Date(assignmentsData[b].createdAt || 0);
+                return dateA - dateB;
+            });
+
+            sortedAssignmentIds.forEach(assignmentId => {
+                const assignment = assignmentsData[assignmentId];
+                if (!assignment) return;
+
+                // ค่า weightScore หากกำหนดไว้ ถ้าไม่มีก็ใช้ maxScore เป็น default
+                const weightScore = assignment.weightScore != null ? assignment.weightScore : assignment.maxScore;
+
+                // สร้าง th ที่แสดงชื่องาน + ผลัดคอลัมน์สำหรับแก้ไข weightScore
+                const th = document.createElement('th');
+                th.className = 'assignment-name-header';
+
+                th.innerHTML = `
+                    ${assignment.name}<br>
+                    (เดิม ${assignment.maxScore} คะแนน)<br>
+                    <label style="font-weight:600; font-size:0.9rem; margin-top:5px; display:block;">
+                      คะแนนเต็มใหม่:
+                      <input 
+                        type="number" min="0" step="0.1" 
+                        value="${weightScore}" 
+                        data-assignment-id="${assignmentId}" 
+                        class="weight-input" style="width:70px; margin-left:5px;" 
+                      />
+                    </label>
+                    <span 
+                      class="material-icons delete-assignment-icon" 
+                      title="ลบงาน" 
+                      onclick="deleteAssignment('${assignmentId}', event)"
+                    >delete_forever</span>
+                `;
+                headerRow.appendChild(th);
+            });
+
+            // เพิ่มคอลัมน์ “คะแนนพิเศษ”
+            const thSpecial = document.createElement('th');
+            thSpecial.className = 'assignment-name-header';
+            thSpecial.textContent = 'คะแนนพิเศษ';
+            headerRow.appendChild(thSpecial);
+
+            // เพิ่มคอลัมน์ “คะแนนรวม (เต็ม 100)”
+            const thTotal = document.createElement('th');
+            thTotal.className = 'score-total-col';
+            thTotal.textContent = 'คะแนนรวม (เต็ม 100)';
+            headerRow.appendChild(thTotal);
+
+            // เพิ่มคอลัมน์ “เกรด”
+            const thGrade = document.createElement('th');
+            thGrade.className = 'score-total-col';
+            thGrade.textContent = 'เกรด';
+            headerRow.appendChild(thGrade);
+
+            // --- สร้าง Body ---
+            // เรียงนักเรียนตามเลขที่ (studentNo) เป็นตัวเลข และ fallback เป็นชื่อจริง
+            const sortedStudentIds = Object.keys(studentsData).sort((a, b) => {
+                const stuA = studentsData[a];
+                const stuB = studentsData[b];
+                if (!stuA || !stuB) return 0;
+                const noA = parseInt(stuA.studentNo);
+                const noB = parseInt(stuB.studentNo);
+                if (!isNaN(noA) && !isNaN(noB)) return noA - noB;
+                return (stuA.firstName || '').localeCompare(stuB.firstName || '');
+            });
+
+            // เมื่อไม่มีนักเรียน ให้แสดงข้อความแจ้งเตือน
+            if (sortedStudentIds.length === 0) {
+                // คอลัมน์ = จำนวน assignments + 3 คอลัมน์คงที่ (Name, Special, Total, Grade)
+                const colspanValue = sortedAssignmentIds.length + 3;
+                tableBody.innerHTML = `<tr><td colspan="${colspanValue}" style="text-align:center;color:var(--light-text-color);">ยังไม่มีนักเรียนในห้องเรียนนี้</td></tr>`;
+                return;
+            }
+
+            sortedStudentIds.forEach(studentId => {
+                const student = studentsData[studentId];
+                if (!student) return;
+
+                const row = tableBody.insertRow();
+                row.id = `studentRow-${studentId}`;
+
+                // คอลัมน์ “ชื่อนักเรียน”
+                const nameCell = row.insertCell();
+                nameCell.className = 'student-name-col';
+                nameCell.textContent = `${student.firstName || ''} ${student.lastName || ''} (เลขที่ ${student.studentNo || '-'})`;
+
+                let totalWeightedScore = 0;     // ผลรวมคะแนนตามสัดส่วน
+                let totalWeightedMaxScore = 0;  // ผลรวม weightScore
+
+                // ไล่สร้างคอลัมน์ score ของงานแต่ละงาน
+                sortedAssignmentIds.forEach(assignmentId => {
+                    const assignment = assignmentsData[assignmentId];
+                    const maxScore = assignment.maxScore || 0;
+                    const weightScore = assignment.weightScore != null ? assignment.weightScore : maxScore;
+                    const studentScoreObj = studentScores[studentId] || {};
+                    const rawScore = studentScoreObj[assignmentId] != null ? studentScoreObj[assignmentId] : '';
+
+                    const cell = row.insertCell();
+
+                    // ถ้า weightScore != maxScore แสดงเป็น “ผลลัพธ์ตามสัดส่วน” และไม่ให้แก้ไข
+                    if (weightScore !== maxScore) {
+                        // คำนวณ weighted score
+                        const rawVal = parseFloat(rawScore) || 0;
+                        const weighted = maxScore > 0 ? rawVal * (weightScore / maxScore) : 0;
+                        totalWeightedScore += weighted;
+                        totalWeightedMaxScore += weightScore;
+
+                        // แสดง input ที่ disabled พร้อมคลาส .disabled-weighted เพื่อเปลี่ยนสี
+                        const input = document.createElement('input');
+                        input.type = 'number';
+                        input.readOnly = true;
+                        input.className = 'disabled-weighted';
+                        input.value = weighted.toFixed(2);
+                        cell.appendChild(input);
+                    } else {
+                        // ถ้า weightScore == maxScore ให้แสดง input สำหรับกรอก raw score ได้ปกติ
+                        const input = document.createElement('input');
+                        input.type = 'number';
+                        input.min = '0';
+                        input.placeholder = '0';
+                        input.value = rawScore;
+                        input.dataset.studentId = studentId;
+                        input.dataset.assignmentId = assignmentId;
+                        input.dataset.maxScore = maxScore;
+                        input.addEventListener('change', updateScore);
+                        input.addEventListener('input', () => {
+                            updateStudentTotalScoreDisplay(studentId);
+                        });
+                        cell.appendChild(input);
+
+                        // คำนวณ weighted score เมื่อ weightScore == maxScore (= rawVal)
+                        const rawVal = parseFloat(rawScore) || 0;
+                        const weighted = rawVal; // เพราะ (weightScore/maxScore)==1
+                        totalWeightedScore += weighted;
+                        totalWeightedMaxScore += weightScore;
+                    }
+                });
+
+                // คอลัมน์ “คะแนนพิเศษ”
+                const specialCell = row.insertCell();
+                const specialScoreVal = (studentScores[studentId] && studentScores[studentId].specialScore != null) 
+                                        ? studentScores[studentId].specialScore 
+                                        : '';
+                const specialInput = document.createElement('input');
+                specialInput.type = 'number';
+                specialInput.min = '0';
+                specialInput.placeholder = '0';
+                specialInput.value = specialScoreVal;
+                specialInput.dataset.studentId = studentId;
+                specialInput.dataset.assignmentId = 'specialScore';
+                specialInput.addEventListener('change', updateScore);
+                specialInput.addEventListener('input', () => {
+                    updateStudentTotalScoreDisplay(studentId);
+                });
+                specialCell.appendChild(specialInput);
+
+                const specialVal = parseFloat(specialScoreVal) || 0;
+                totalWeightedScore += specialVal;
+                // (specialScore ไม่บวกลง denominator เพราะถือเป็น extra credit)
+
+                // คอลัมน์ “คะแนนรวม (เต็ม 100)”
+                const totalCell = row.insertCell();
+                totalCell.className = 'score-total-col';
+                const normalized = totalWeightedMaxScore > 0
+                    ? (totalWeightedScore / totalWeightedMaxScore) * 100
+                    : 0;
+                totalCell.textContent = `${normalized.toFixed(2)} / 100`;
+                totalCell.id = `totalScoreDisplay-${studentId}`;
+
+                // คอลัมน์ “เกรด”
+                const gradeCell = row.insertCell();
+                gradeCell.className = 'score-total-col';
+                gradeCell.textContent = calculateGrade(normalized);
+            });
+
+            // ต่อท้าย: แนบ event listener ให้ weight-input ทุกตัว เพื่ออัปเดต weightScore
+            document.querySelectorAll('.weight-input').forEach(input => {
+                input.addEventListener('change', e => {
+                    const assignmentId = e.target.dataset.assignmentId;
+                    let val = parseFloat(e.target.value);
+                    if (isNaN(val) || val < 0) val = 0;
+                    e.target.value = val;
+                    db.ref(`classes/${currentClassId}/assignments/${assignmentId}/weightScore`).set(val)
+                        .then(() => {
+                            renderScoreTable(); 
+                        })
+                        .catch(error => {
+                            console.error("Error saving weightScore:", error);
+                            alert('เกิดข้อผิดพลาดในการบันทึกคะแนนเต็มใหม่');
+                        });
+                });
+            });
+        }
+
+        /**
+         * คำนวณเกรดจากคะแนน out of 100
+         * @param {number} score 
+         * @returns {string} เกรด (ตัวเลข 4.0–0)
+         */
+        function calculateGrade(score) {
+            if (score >= 80) return '4.0';
+            if (score >= 75) return '3.5';
+            if (score >= 70) return '3.0';
+            if (score >= 65) return '2.5';
+            if (score >= 60) return '2.0';
+            if (score >= 55) return '1.5';
+            if (score >= 50) return '1.0';
+            return '0';
+        }
+
+        /**
+         * เมื่อผู้ใช้แก้ไขคะแนนใน cell ให้ validate และบันทึกลง Firebase
+         * @param {Event} event 
+         */
+        function updateScore(event) {
+            const input = event.target;
+            const studentId = input.dataset.studentId;
+            const assignmentId = input.dataset.assignmentId;
+            const maxScore = parseFloat(input.dataset.maxScore);
+
+            let score = parseFloat(input.value);
+            if (isNaN(score) || score < 0) {
+                score = 0;
+            } else if (assignmentId !== 'specialScore' && score > maxScore) {
+                alert(`คะแนนต้องไม่เกิน ${maxScore}`);
+                score = maxScore;
+            }
+            input.value = score;
+
+            // บันทึกลง Firebase
+            db.ref(`classes/${currentClassId}/scores/${studentId}/${assignmentId}`).set(score)
+                .then(() => {
+                    // ไม่ต้องเรียก renderScoreTable ใหม่ทั้งหมด เพราะ input event จะอัปเดตแค่คะแนนรวม
+                    console.log(`Updated score: student ${studentId}, assignment ${assignmentId} = ${score}`);
+                    // แต่ถ้าต้องการบังคับให้ render ใหม่ให้ครบถ้วน uncomment ข้างล่างนี้:
+                    // renderScoreTable();
+                })
+                .catch(error => {
+                    console.error("Error updating score:", error);
+                    alert("เกิดข้อผิดพลาดในการบันทึกคะแนน");
+                });
+        }
+
+        /**
+         * คำนวณและอัปเดต “คะแนนรวม (เต็ม 100)” และ “เกรด” ให้แสดงผลทันทีขณะผู้ใช้พิมพ์
+         * @param {string} studentId 
+         */
+        function updateStudentTotalScoreDisplay(studentId) {
+            let curTotalWeightedScore = 0;
+            let curTotalWeightedMaxScore = 0;
+            const row = document.getElementById(`studentRow-${studentId}`);
+            if (!row) return;
+
+            // หาทุก input คะแนนงาน (ยกเว้น specialScore)
+            const assignmentInputs = row.querySelectorAll('input[type="number"][data-assignment-id]:not([data-assignment-id="specialScore"])');
+            assignmentInputs.forEach(input => {
+                const aid = input.dataset.assignmentId;
+                const assign = assignmentsData[aid];
+                if (!assign) return;
+                // ถ้า weightScore != maxScore (input เป็น disabled-weighted) ให้แปลงค่าเป็น weightedVal
+                const rawVal = parseFloat(input.value) || 0;
+                const maxVal = assign.maxScore || 0;
+                const weightVal = assign.weightScore != null ? assign.weightScore : maxVal;
+                const weighted = maxVal > 0 ? rawVal * (weightVal / maxVal) : 0;
+                curTotalWeightedScore += weighted;
+                curTotalWeightedMaxScore += weightVal;
+            });
+
+            // หาค่า specialScore
+            const specialInput = row.querySelector('input[data-assignment-id="specialScore"]');
+            if (specialInput) {
+                const specialVal = parseFloat(specialInput.value) || 0;
+                curTotalWeightedScore += specialVal; // นำไปบวกเฉพาะ numerator
+            }
+
+            // คำนวณ normalized
+            const normalized = curTotalWeightedMaxScore > 0
+                ? (curTotalWeightedScore / curTotalWeightedMaxScore) * 100
+                : 0;
+
+            // อัปเดตเซลล์คะแนนรวม
+            const totalCell = document.getElementById(`totalScoreDisplay-${studentId}`);
+            if (totalCell) {
+                totalCell.textContent = `${normalized.toFixed(2)} / 100`;
+            }
+            // อัปเดตเซลล์เกรด (อยู่ใน column ถัดไป)
+            const gradeCell = totalCell.nextElementSibling;
+            if (gradeCell) {
+                gradeCell.textContent = calculateGrade(normalized);
+            }
+        }
+
+        /**
+         * เมื่อผู้ใช้กด “เพิ่มงาน” ให้สร้าง assignment ใหม่ใน Firebase
+         * @param {Event} event 
+         */
+        function addAssignment(event) {
+            event.preventDefault();
+            const name = document.getElementById('assignmentName').value.trim();
+            const maxScore = parseFloat(document.getElementById('assignmentMaxScore').value);
+            if (!name || isNaN(maxScore) || maxScore <= 0) {
+                alert('กรุณากรอกชื่อหัวข้องานและคะแนนเต็มให้ถูกต้อง (ต้องมากกว่า 0)');
+                return;
+            }
+
+            const ref = db.ref(`classes/${currentClassId}/assignments`).push();
+            ref.set({
+                name: name,
+                maxScore: maxScore,
+                weightScore: maxScore,        // เริ่มต้นให้ weightScore = maxScore
+                createdAt: new Date().toISOString()
+            }).then(() => {
+                alert('เพิ่มงานสำเร็จ');
+                document.getElementById('assignmentForm').reset();
+            }).catch(error => {
+                console.error("Error adding assignment:", error);
+                alert("เกิดข้อผิดพลาดในการเพิ่มงาน");
+            });
+        }
+
+        /**
+         * ลบ assignment และคะแนนของ assignment นั้น ๆ จาก Firebase ทุกรายชื่อนักเรียน
+         * @param {string} assignmentId 
+         * @param {Event} event 
+         */
+        function deleteAssignment(assignmentId, event) {
+            event.stopPropagation();
+            const assignName = assignmentsData[assignmentId] && assignmentsData[assignmentId].name;
+            if (!assignName) {
+                alert('ไม่พบข้อมูลงานนี้');
+                return;
+            }
+            if (!confirm(`ต้องการลบงาน "${assignName}" ใช่หรือไม่? คะแนนของงานนี้จะถูกลบออกด้วย`)) {
+                return;
+            }
+
+            // ลบข้อมูล assignment
+            db.ref(`classes/${currentClassId}/assignments/${assignmentId}`).remove()
+                .then(() => {
+                    console.log(`Deleted assignment ${assignmentId}`);
+
+                    // ลบคะแนน assignment จากนักเรียนทุกคน
+                    Object.keys(studentsData).forEach(sid => {
+                        db.ref(`classes/${currentClassId}/scores/${sid}/${assignmentId}`).remove();
+                    });
+                    alert('ลบงานสำเร็จ');
+                })
+                .catch(error => {
+                    console.error("Error deleting assignment:", error);
+                    alert("เกิดข้อผิดพลาดในการลบงาน");
+                });
+        }
+    </script>
+</body>
+</html>
