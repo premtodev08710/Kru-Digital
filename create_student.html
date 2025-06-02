@@ -1,692 +1,379 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>สร้างนักเรียน - ระบบจัดการชั้นเรียน</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <style>
-        :root {
-            --primary-color: #4CAF50; /* Green */
-            --secondary-color: #2196F3; /* Blue */
-            --accent-color: #FFC107; /* Amber/Yellow */
-            --danger-color: #f44336; /* Red */
-            --text-color: #333;
-            --light-text-color: #666;
-            --background-color: #f0f2f5;
-            --card-background: #ffffff;
-            --border-color: #e0e0e0;
-            --hover-light: #e3f2fd;
-            --sidebar-bg: #2c3e50; /* Dark blue-gray */
-            --sidebar-text: #ecf0f1; /* Light gray */
-            --sidebar-active-bg: #34495e; /* Slightly lighter dark */
-            --sidebar-hover-bg: #3a536b;
-            --button-blue: #2196F3;
-            --button-blue-hover: #1976D2;
-            --button-excel: #22a661; /* Green for CSV button */
-            --button-excel-hover: #1e8e50;
-        }
-
-        body {
-            font-family: 'Sarabun', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* --- Sidebar --- */
-        .sidebar {
-            width: 250px;
-            background-color: var(--sidebar-bg);
-            color: var(--sidebar-text);
-            padding: 20px 0;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            flex-shrink: 0;
-        }
-
-        .sidebar .logo-section {
-            display: flex;
-            align-items: center;
-            padding: 0 20px 30px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
-        }
-
-        .sidebar .logo-icon {
-            font-size: 2.2rem;
-            color: var(--primary-color);
-            margin-right: 10px;
-        }
-
-        .sidebar .logo-text {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--sidebar-text);
-        }
-
-        .sidebar nav ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            flex-grow: 1;
-        }
-
-        .sidebar nav ul li a {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            color: var(--sidebar-text);
-            text-decoration: none;
-            font-weight: 600;
-            transition: background-color 0.3s ease, color 0.3s ease;
-            border-radius: 8px;
-            margin: 0 10px;
-        }
-
-        .sidebar nav ul li a .material-icons {
-            margin-right: 15px;
-            font-size: 1.5rem;
-        }
-
-        .sidebar nav ul li a:hover {
-            background-color: var(--sidebar-hover-bg);
-        }
-
-        .sidebar nav ul li a.active {
-            background-color: var(--sidebar-active-bg);
-            color: var(--primary-color);
-            box-shadow: inset 3px 0 0 var(--primary-color);
-        }
-
-        .sidebar .bottom-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 15px 20px;
-            margin: 20px;
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .sidebar .bottom-button .material-icons {
-            margin-right: 10px;
-            font-size: 1.6rem;
-        }
-
-        .sidebar .bottom-button:hover {
-            background-color: var(--sidebar-hover-bg);
-            transform: translateY(-2px);
-        }
-
-        /* --- Main Content --- */
-        .main-content {
-            flex-grow: 1;
-            padding: 30px;
-            display: flex; /* จัด 2 ฝั่งด้วย flexbox */
-            gap: 30px;
-            flex-wrap: wrap; /* ยุบลงบนหน้าจอเล็ก */
-        }
-
-        /* --- ด้านซ้าย: รายชื่อนักเรียน --- */
-        .student-list-section {
-            flex: 2; /* กินพื้นที่ 2 ส่วน */
-            min-width: 300px;
-            background-color: var(--card-background);
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .student-list-section h2 {
-            color: var(--secondary-color);
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: 1.8rem;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-        }
-
-        .student-table-container {
-            flex-grow: 1;
-            overflow-y: auto;
-            max-height: calc(100vh - 250px);
-        }
-
-        .student-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.95rem;
-        }
-
-        .student-table th,
-        .student-table td {
-            text-align: left;
-            padding: 12px 15px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .student-table th {
-            background-color: var(--background-color);
-            color: var(--text-color);
-            font-weight: 600;
-            position: sticky;
-            top: 0;
-            z-index: 1;
-        }
-
-        .student-table tbody tr:hover {
-            background-color: var(--hover-light);
-        }
-
-        .student-table tbody tr.no-students-row td {
-            text-align: center;
-            color: var(--light-text-color);
-            font-style: italic;
-            padding: 20px;
-        }
-
-        /* --- ด้านขวา: ฟอร์มสร้างนักเรียน --- */
-        .registration-form-section {
-            flex: 1; /* กินพื้นที่ 1 ส่วน */
-            min-width: 300px;
-            background-color: var(--card-background);
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        }
-
-        .registration-form-section h2 {
-            color: var(--secondary-color);
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: 1.8rem;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .registration-form-section .button-row {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: flex-start;
-            margin-bottom: 20px;
-        }
-
-        .registration-form-section .excel-import-button,
-        .registration-form-section .download-sample-button {
-            background-color: var(--button-excel);
-            color: white;
-            padding: 8px 15px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            text-decoration: none;
-        }
-
-        .registration-form-section .excel-import-button:hover,
-        .registration-form-section .download-sample-button:hover {
-            background-color: var(--button-excel-hover);
-            transform: translateY(-1px);
-        }
-
-        .registration-form-section label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--text-color);
-        }
-
-        .registration-form-section input[type="text"] {
-            width: calc(100% - 24px); /* เต็มกว้างลบ padding */
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 1rem;
-            box-sizing: border-box;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .registration-form-section input[type="text"]:focus {
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
-            outline: none;
-        }
-
-        .registration-form-section .create-button {
-            background-color: var(--button-blue);
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: 600;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            width: 100%; /* ปุ่มเต็มความกว้าง */
-            margin-top: 10px;
-        }
-
-        .registration-form-section .create-button:hover {
-            background-color: var(--button-blue-hover);
-            transform: translateY(-2px);
-        }
-
-        /* --- Responsive --- */
-        @media (max-width: 768px) {
-            body {
-                flex-direction: column;
-            }
-            .sidebar {
-                width: 100%;
-                height: auto;
-                padding: 15px 0;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            }
-            .sidebar .logo-section {
-                padding-bottom: 15px;
-                margin-bottom: 15px;
-                justify-content: center;
-            }
-            .sidebar nav ul {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 5px;
-            }
-            .sidebar nav ul li {
-                flex: 1 1 auto;
-                max-width: 150px;
-            }
-            .sidebar nav ul li a {
-                padding: 10px 15px;
-                margin: 0 5px;
-                justify-content: center;
-                flex-direction: column;
-                font-size: 0.85rem;
-            }
-            .sidebar nav ul li a .material-icons {
-                margin-right: 0;
-                margin-bottom: 5px;
-            }
-            .sidebar nav ul li a.active {
-                box-shadow: inset 0 -3px 0 var(--primary-color);
-            }
-            .sidebar .bottom-button {
-                margin: 15px;
-                font-size: 0.9rem;
-            }
-
-            .main-content {
-                flex-direction: column; /* ซ้อนกันบนจอเล็ก */
-                padding: 20px;
-                gap: 20px;
-            }
-            .student-list-section,
-            .registration-form-section {
-                flex: none; /* ไม่ยืด */
-                width: 100%;
-                min-width: unset;
-                padding: 20px;
-            }
-            .student-list-section h2,
-            .registration-form-section h2 {
-                font-size: 1.5rem;
-            }
-            .student-table th, .student-table td {
-                padding: 10px;
-                font-size: 0.9rem;
-            }
-            .registration-form-section .excel-import-button,
-            .registration-form-section .download-sample-button {
-                font-size: 0.85rem;
-                padding: 6px 12px;
-            }
-            .registration-form-section input[type="text"] {
-                font-size: 0.9rem;
-                padding: 8px;
-            }
-            .registration-form-section .create-button {
-                font-size: 1rem;
-                padding: 10px 20px;
-            }
-        }
-    </style>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>สร้างนักเรียน - ระบบจัดการชั้นเรียน</title>
+  <!-- ใช้ฟอนต์ Prompt -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <link rel="stylesheet" href="classroom.css" />
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="logo-section">
-            <span class="material-icons logo-icon">menu_book</span>
-            <span class="logo-text">ระบบจัดการชั้นเรียน</span>
-        </div>
-        <nav>
-            <ul>
-                <li><a href="index.html"><span class="material-icons">home</span>หน้าแรก</a></li>
-                <li><a href="#" class="active"><span class="material-icons">school</span>ห้องเรียน</a></li>
-                <li><a href="#"><span class="material-icons">assignment</span>มอบหมายงาน</a></li>
-                <li><a href="#"><span class="material-icons">event_note</span>ข้อมูลการเข้าเรียน</a></li>
-                <li><a href="summary.html"><span class="material-icons">bar_chart</span>คะแนนรวม</a></li>
-            </ul>
-        </nav>
-        <a href="index.html" class="bottom-button">
-            <span class="material-icons">add_circle</span>
-            หน้าหลัก
+  <!-- --------------------- SIDEBAR --------------------- -->
+  <div class="sidebar" id="sidebar">
+    <button class="sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="สลับแถบข้าง">
+      <span class="material-icons">menu</span>
+    </button>
+    <div class="logo-section">
+      <span class="material-icons logo-icon">menu_book</span>
+      <span class="logo-text">ระบบจัดการชั้นเรียน</span>
+    </div>
+    <nav>
+      <ul>
+        <li>
+          <a href="index.html">
+            <span class="material-icons">home</span>
+            <span class="menu-label">หน้าแรก</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="active" id="classLink">
+            <span class="material-icons">school</span>
+            <span class="menu-label">ห้องเรียน</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" id="assignmentsLink">
+            <span class="material-icons">assignment</span>
+            <span class="menu-label">มอบหมายงาน</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" id="attendanceLink">
+            <span class="material-icons">event_note</span>
+            <span class="menu-label">ข้อมูลการเข้าเรียน</span>
+          </a>
+        </li>
+        <li>
+          <a href="summary.html" id="summaryLink">
+            <span class="material-icons">bar_chart</span>
+            <span class="menu-label">คะแนนรวม</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+   
+  </div>
+
+  <!-- ------------------- MAIN CONTENT ------------------- -->
+  <div class="main-content">
+    <!-- ด้านซ้าย: รายชื่อนักเรียน -->
+    <div class="student-list-section">
+      <h2>รายชื่อนักเรียนในห้อง</h2>
+      <div class="student-table-container">
+        <table class="student-table">
+          <thead>
+            <tr>
+              <th>เลขที่</th>
+              <th>ชื่อจริง</th>
+              <th>นามสกุล</th>
+            </tr>
+          </thead>
+          <tbody id="studentListTableBody">
+            <tr class="no-students-row">
+              <td colspan="3" style="text-align:center; color: var(--light-text-color);">
+                กำลังโหลดรายชื่อนักเรียน...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ด้านขวา: ฟอร์มสร้างนักเรียน -->
+    <div class="registration-form-section">
+      <h2>ลงทะเบียนนักเรียน</h2>
+      <div class="button-row">
+        <button class="excel-import-button" id="btnImportExcel">
+          <span class="material-icons">upload_file</span>
+          นำเข้าข้อมูลจาก CSV (ภาษาไทย)
+        </button>
+        <a href="#" class="download-sample-button" id="downloadSampleBtn">
+          <span class="material-icons">download</span>
+          ดาวน์โหลดตัวอย่าง CSV
         </a>
+      </div>
+      <form id="studentRegistrationForm">
+        <label for="firstName">ชื่อจริง:</label>
+        <input type="text" id="firstName" placeholder="เช่น เพิ่มลาภ" required />
+
+        <label for="lastName">นามสกุล (ไม่บังคับ):</label>
+        <input type="text" id="lastName" placeholder="เช่น ไพรีพินัย" />
+
+        <label for="studentNo">เลขที่:</label>
+        <input type="text" id="studentNo" placeholder="เช่น 02" required />
+
+        <button type="submit" class="create-button">สร้าง</button>
+      </form>
+      <!-- input ซ่อน สำหรับเลือกไฟล์ CSV -->
+      <input type="file" id="excelFileInput" accept=".csv" style="display:none" />
     </div>
+  </div>
 
-    <div class="main-content">
-        <!-- ส่วนแสดงรายชื่อนักเรียน -->
-        <div class="student-list-section">
-            <h2>รายชื่อนักเรียนในห้อง</h2>
-            <div class="student-table-container">
-                <table class="student-table">
-                    <thead>
-                        <tr>
-                            <th>เลขที่</th>
-                            <th>ชื่อจริง</th>
-                            <th>นามสกุล</th>
-                        </tr>
-                    </thead>
-                    <tbody id="studentListTableBody">
-                        <tr class="no-students-row"><td colspan="3">กำลังโหลดรายชื่อนักเรียน...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+  <!-- ---------------- Sidebar Toggle Script ---------------- -->
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('collapsed');
+    }
+  </script>
 
-        <!-- ส่วนฟอร์มสร้างนักเรียน -->
-        <div class="registration-form-section">
-            <h2>ลงทะเบียนนักเรียน</h2>
-            <div class="button-row">
-                <button class="excel-import-button" id="btnImportExcel">
-                    <span class="material-icons">upload_file</span>
-                    นำเข้าข้อมูลจาก CSV (ภาษาไทย)
-                </button>
-                <a href="#" class="download-sample-button" id="downloadSampleBtn">
-                    <span class="material-icons">download</span>
-                    ดาวน์โหลดตัวอย่าง CSV
-                </a>
-            </div>
-            <form id="studentRegistrationForm">
-                <label for="firstName">ชื่อจริง:</label>
-                <input type="text" id="firstName" placeholder="เช่น เพิ่มลาภ" required>
-
-                <label for="lastName">นามสกุล (ไม่บังคับ):</label>
-                <input type="text" id="lastName" placeholder="เช่น ไพรีพินัย">
-
-                <label for="studentNo">เลขที่:</label>
-                <input type="text" id="studentNo" placeholder="เช่น 02" required>
-
-                <button type="submit" class="create-button">สร้าง</button>
-            </form>
-
-            <!-- input ซ่อน สำหรับเลือกไฟล์ CSV -->
-            <input type="file" id="excelFileInput" accept=".csv" style="display:none">
-        </div>
-    </div>
-
-    <script>
-        // Firebase configuration (เหมือนไฟล์อื่น ๆ)
-        const firebaseConfig = {
-           apiKey: "AIzaSyCTyiR22AHeiKzI7Yr0g-V_dmdVPeh4ybo",
+  <!-- ======= Firebase + Logic สร้าง/โหลดนักเรียน + นำเข้า CSV ======= -->
+  <script>
+    // ====== Firebase Config =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyCTyiR22AHeiKzI7Yr0g-V_dmdVPeh4ybo",
       authDomain: "kru-digital.firebaseapp.com",
       projectId: "kru-digital",
       storageBucket: "kru-digital.firebasestorage.app",
       messagingSenderId: "464969597852",
-      appId: "1:464969597852:web:7763a74cc042f231717e59",
-            measurementId: "G-ERDZ2Q5BFZ"
-        };
+      appId: "1:464969597852:web:7763a74cc042f231717e59"
+    };
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.database();
 
-        // Initialize Firebase
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const db = firebase.database();
+    let currentClassId = '';
 
-        let currentClassId = '';
+    window.onload = () => {
+      // ดึง ?class=... จาก URL
+      const urlParams = new URLSearchParams(window.location.search);
+      currentClassId = urlParams.get('class');
 
-        window.onload = () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            currentClassId = urlParams.get('class');
+      if (!currentClassId) {
+        alert('ไม่พบ Class ID กรุณากลับไปหน้าหลัก');
+        window.location.href = 'index.html';
+        return;
+      }
 
-            if (!currentClassId) {
-                alert('ไม่พบ Class ID กรุณากลับไปหน้าหลัก');
-                window.location.href = 'index.html';
-                return;
-            }
+      // ปรับลิงก์ใน sidebar ให้มี ?class={currentClassId}
+      setupSidebarLinks();
 
-            // ปรับลิงก์ใน sidebar ให้มี ?class={currentClassId}
-            document.querySelectorAll('.sidebar nav ul li a').forEach(link => {
-                const href = link.getAttribute('href');
-                if (href === '#' && link.classList.contains('active')) {
-                    link.setAttribute('href', `class_management.html?class=${currentClassId}`);
-                } else if (href && href !== 'index.html' && href !== 'summary.html') {
-                    link.setAttribute('href', `${href.split('?')[0]}?class=${currentClassId}`);
-                }
+      // โหลดรายชื่อนักเรียน
+      loadStudents(currentClassId);
+
+      // ตั้งค่า event สำหรับฟอร์มสร้างนักเรียน
+      document
+        .getElementById('studentRegistrationForm')
+        .addEventListener('submit', addStudent);
+
+      // ตั้งค่า CSV import button ให้กดแล้วเปิด file picker
+      document.getElementById('btnImportExcel').addEventListener('click', () => {
+        document.getElementById('excelFileInput').click();
+      });
+      document
+        .getElementById('excelFileInput')
+        .addEventListener('change', handleExcelFile);
+
+      // สร้างตัวอย่าง CSV ให้ดาวน์โหลด
+      setupSampleCSVDownload();
+    };
+
+    // ---------- Sidebar Link Setup ----------
+    function setupSidebarLinks() {
+      document.getElementById("classLink").href = `class_management.html?class=${currentClassId}`;
+      document.getElementById("assignmentsLink").href = `assignments.html?class=${currentClassId}`;
+      document.getElementById("attendanceLink").href = `attendance.html?class=${currentClassId}`;
+      document.getElementById("summaryLink").href = `summary.html?class=${currentClassId}`;
+    }
+
+    // โหลดข้อมูลนักเรียนจาก Firebase มาแสดงในตาราง
+    function loadStudents(classId) {
+      const studentListBody = document.getElementById('studentListTableBody');
+      studentListBody.innerHTML = `
+        <tr class="no-students-row">
+          <td colspan="3" style="text-align:center; color: var(--light-text-color);">
+            กำลังโหลดรายชื่อนักเรียน...
+          </td>
+        </tr>`;
+
+      db.ref(`classes/${classId}/students`).on(
+        'value',
+        (snapshot) => {
+          const students = snapshot.val();
+          studentListBody.innerHTML = '';
+
+          if (students) {
+            // นำข้อมูลมาเป็น array และเรียงตามเลขที่
+            const studentArray = Object.keys(students).map((key) => ({
+              id: key,
+              ...students[key]
+            }));
+            studentArray.sort((a, b) => {
+              const noA = parseInt(a.studentNo);
+              const noB = parseInt(b.studentNo);
+              if (!isNaN(noA) && !isNaN(noB)) {
+                return noA - noB;
+              }
+              return (a.studentNo || '').localeCompare(b.studentNo || '');
             });
 
-            // โหลดรายชื่อนักเรียน
-            loadStudents(currentClassId);
-
-            // ตั้งค่า event สำหรับฟอร์มสร้างนักเรียน
-            document.getElementById('studentRegistrationForm').addEventListener('submit', addStudent);
-
-            // ตั้งค่า CSV import button
-            document.getElementById('btnImportExcel').addEventListener('click', () => {
-                document.getElementById('excelFileInput').click();
+            studentArray.forEach((student) => {
+              const row = studentListBody.insertRow();
+              row.insertCell(0).textContent = student.studentNo || '-';
+              row.insertCell(1).textContent = student.firstName || '';
+              row.insertCell(2).textContent = student.lastName || '';
             });
-            document.getElementById('excelFileInput').addEventListener('change', handleExcelFile);
+          } else {
+            studentListBody.innerHTML = `
+              <tr class="no-students-row">
+                <td colspan="3">ยังไม่มีนักเรียนในห้องเรียนนี้</td>
+              </tr>`;
+          }
+        },
+        (error) => {
+          console.error("Error loading students: ", error);
+          studentListBody.innerHTML = `
+            <tr class="no-students-row">
+              <td colspan="3" style="color: var(--danger-color);">
+                เกิดข้อผิดพลาดในการโหลดรายชื่อนักเรียน
+              </td>
+            </tr>`;
+        }
+      );
+    }
 
-            // สร้างและตั้งลิงก์ดาวน์โหลดไฟล์ CSV ตัวอย่าง (ภาษาไทย พร้อม BOM)
-            setupSampleCSVDownload();
-        };
+    // ฟังก์ชันเพิ่มนักเรียนจากฟอร์ม
+    function addStudent(event) {
+      event.preventDefault();
 
-        // โหลดข้อมูลนักเรียนจาก Firebase มาแสดงในตาราง
-        function loadStudents(classId) {
-            const studentListBody = document.getElementById('studentListTableBody');
-            studentListBody.innerHTML = '<tr class="no-students-row"><td colspan="3">กำลังโหลดรายชื่อนักเรียน...</td></tr>';
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName = document.getElementById('lastName').value.trim();
+      const studentNo = document.getElementById('studentNo').value.trim();
 
-            db.ref(`classes/${classId}/students`).on('value', (snapshot) => {
-                const students = snapshot.val();
-                studentListBody.innerHTML = '';
+      if (!firstName || !studentNo) {
+        alert('กรุณากรอกชื่อจริงและเลขที่');
+        return;
+      }
 
-                if (students) {
-                    const studentArray = Object.keys(students).map(key => ({ id: key, ...students[key] }));
+      const newStudentRef = db.ref(`classes/${currentClassId}/students`).push();
+      const newStudentId = newStudentRef.key;
 
-                    // เรียงตามเลขที่ (ตัวเลขก่อน ถ้าไม่ใช่ตัวเลขให้ใช้ string compare)
-                    studentArray.sort((a, b) => {
-                        const noA = parseInt(a.studentNo);
-                        const noB = parseInt(b.studentNo);
-                        if (!isNaN(noA) && !isNaN(noB)) {
-                            return noA - noB;
-                        }
-                        return (a.studentNo || '').localeCompare(b.studentNo || '');
-                    });
+      newStudentRef
+        .set({
+          firstName: firstName,
+          lastName: lastName,
+          studentNo: studentNo,
+          createdAt: new Date().toISOString()
+        })
+        .then(() => {
+          // สร้างคะแนนเริ่มต้นให้ 0
+          db.ref(`classes/${currentClassId}/scores/${newStudentId}`).set({
+            totalScore: 0,
+            specialScore: 0
+          });
+          alert('เพิ่มนักเรียนสำเร็จ!');
+          document.getElementById('studentRegistrationForm').reset();
+        })
+        .catch((error) => {
+          console.error("Error adding student: ", error);
+          alert("เกิดข้อผิดพลาดในการเพิ่มนักเรียน");
+        });
+    }
 
-                    studentArray.forEach(student => {
-                        const row = studentListBody.insertRow();
-                        row.insertCell(0).textContent = student.studentNo || '-';
-                        row.insertCell(1).textContent = student.firstName || '';
-                        row.insertCell(2).textContent = student.lastName || '';
-                    });
-                } else {
-                    studentListBody.innerHTML = '<tr class="no-students-row"><td colspan="3">ยังไม่มีนักเรียนในห้องเรียนนี้</td></tr>';
-                }
-            }, (error) => {
-                console.error("Error loading students: ", error);
-                studentListBody.innerHTML = '<tr class="no-students-row"><td colspan="3" style="color: var(--danger-color);">เกิดข้อผิดพลาดในการโหลดรายชื่อนักเรียน</td></tr>';
-            });
+    // ฟังก์ชันอ่านไฟล์ CSV (UTF-8) แล้วนำเข้าระบบ
+    function handleExcelFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const text = e.target.result;
+        parseAndImportCSV(text);
+      };
+      reader.readAsText(file, 'UTF-8');
+      event.target.value = ''; // รีเซ็ตให้เลือกไฟล์เดิมได้
+    }
+
+    // แปลงข้อความ CSV เป็นข้อมูล JSON และอัปโหลดลง Firebase
+    function parseAndImportCSV(csvText) {
+      const lines = csvText.trim().split(/\r?\n/);
+      if (lines.length < 2) {
+        alert('CSV ไม่ถูกต้อง: กรุณาตรวจสอบไฟล์');
+        return;
+      }
+
+      const headerCols = lines[0].split(',').map((h) => h.trim());
+      const idxNo = headerCols.findIndex((h) => h === 'เลขที่');
+      const idxFirst = headerCols.findIndex((h) => h === 'ชื่อจริง');
+      const idxLast = headerCols.findIndex((h) => h === 'นามสกุล');
+
+      if (idxNo === -1 || idxFirst === -1) {
+        alert('CSV ไม่ถูกต้อง: หัวตารางต้องมี "เลขที่" และ "ชื่อจริง" อย่างน้อย');
+        return;
+      }
+
+      const errorRows = [];
+      const importPromises = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(',').map((c) => c.trim());
+        const studentNo = cols[idxNo] || '';
+        const firstName = cols[idxFirst] || '';
+        const lastName = idxLast !== -1 ? cols[idxLast] || '' : '';
+
+        if (!studentNo || !firstName) {
+          errorRows.push(i + 1);
+          continue;
         }
 
-        // ฟังก์ชันเพิ่มนักเรียนจากฟอร์ม
-        function addStudent(event) {
-            event.preventDefault();
+        const newStudentRef = db.ref(`classes/${currentClassId}/students`).push();
+        const newStudentId = newStudentRef.key;
+        const setPromise = newStudentRef
+          .set({
+            firstName: firstName,
+            lastName: lastName,
+            studentNo: studentNo,
+            createdAt: new Date().toISOString()
+          })
+          .then(() =>
+            db
+              .ref(`classes/${currentClassId}/scores/${newStudentId}`)
+              .set({ totalScore: 0, specialScore: 0 })
+          );
 
-            const firstName = document.getElementById('firstName').value.trim();
-            const lastName = document.getElementById('lastName').value.trim();
-            const studentNo = document.getElementById('studentNo').value.trim();
+        importPromises.push(setPromise);
+      }
 
-            if (!firstName || !studentNo) {
-                alert('กรุณากรอกชื่อจริงและเลขที่');
-                return;
-            }
+      Promise.all(importPromises)
+        .then(() => {
+          if (errorRows.length) {
+            alert(`นำเข้าข้อมูลเรียบร้อย แต่มีข้อผิดพลาดในบรรทัด: ${errorRows.join(', ')} โปรดตรวจสอบแล้วนำเข้าใหม่`);
+          } else {
+            alert('นำเข้าข้อมูลเรียบร้อยทั้งหมด');
+          }
+        })
+        .catch((err) => {
+          console.error('Error importing CSV:', err);
+          alert('เกิดข้อผิดพลาดในการนำเข้า CSV');
+        });
+    }
 
-            const newStudentRef = db.ref(`classes/${currentClassId}/students`).push();
-            const newStudentId = newStudentRef.key;
+    // สร้างตัวอย่าง CSV (ภาษาไทย) พร้อม BOM เพื่อให้ Excel อ่าน UTF-8 ได้
+    function setupSampleCSVDownload() {
+      const headers = ['เลขที่', 'ชื่อจริง', 'นามสกุล'];
+      const sampleRows = [
+        ['01', 'เพิ่มลาภ', 'ไพรีพินัย'],
+        ['02', 'ดวงใจ', 'อรุณรังษี']
+      ];
+      let csvContent = headers.join(',') + '\n';
+      sampleRows.forEach((row) => {
+        csvContent += row.join(',') + '\n';
+      });
 
-            newStudentRef.set({
-                firstName: firstName,
-                lastName: lastName,
-                studentNo: studentNo,
-                createdAt: new Date().toISOString()
-            })
-            .then(() => {
-                // สร้างคะแนนเริ่มต้นให้ 0
-                db.ref(`classes/${currentClassId}/scores/${newStudentId}`).set({
-                    totalScore: 0,
-                    specialScore: 0
-                });
-                alert('เพิ่มนักเรียนสำเร็จ!');
-                document.getElementById('studentRegistrationForm').reset();
-            })
-            .catch(error => {
-                console.error("Error adding student: ", error);
-                alert("เกิดข้อผิดพลาดในการเพิ่มนักเรียน");
-            });
-        }
-
-        // ฟังก์ชันอ่านไฟล์ CSV (UTF-8) ที่มีหัวตารางเป็นภาษาไทย แล้วนำเข้าระบบ
-        function handleExcelFile(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const text = e.target.result;
-                parseAndImportCSV(text);
-            };
-            // อ่านด้วย UTF-8 เพื่อรองรับภาษาไทย
-            reader.readAsText(file, 'UTF-8');
-            event.target.value = ''; // รีเซ็ตให้เลือกไฟล์เดียวกันซ้ำได้
-        }
-
-        // แปลงข้อความ CSV เป็นอักขระภาษาไทยและอัปโหลดลง Firebase
-        function parseAndImportCSV(csvText) {
-            // แยกเป็นบรรทัด รองรับ CRLF และ LF
-            const lines = csvText.trim().split(/\r?\n/);
-            if (lines.length < 2) {
-                alert('CSV ไม่ถูกต้อง: กรุณาตรวจสอบไฟล์');
-                return;
-            }
-
-            // อ่านหัวตาราง (บรรทัดแรก) ว่ามี 'เลขที่','ชื่อจริง','นามสกุล'
-            const headerCols = lines[0].split(',').map(h => h.trim());
-            const idxNo = headerCols.findIndex(h => h === 'เลขที่');
-            const idxFirst = headerCols.findIndex(h => h === 'ชื่อจริง');
-            const idxLast = headerCols.findIndex(h => h === 'นามสกุล');
-
-            // ตรวจสอบหัวตารางว่าถูกต้อง
-            if (idxNo === -1 || idxFirst === -1) {
-                alert('CSV ไม่ถูกต้อง: หัวตารางต้องมี "เลขที่" และ "ชื่อจริง" อย่างน้อย');
-                return;
-            }
-
-            const errorRows = [];
-            const importPromises = [];
-
-            // วนลูปตั้งแต่บรรทัดที่ 2 เป็นต้นไป
-            for (let i = 1; i < lines.length; i++) {
-                const cols = lines[i].split(',').map(c => c.trim());
-                const studentNo = cols[idxNo] || '';
-                const firstName = cols[idxFirst] || '';
-                const lastName = idxLast !== -1 ? (cols[idxLast] || '') : '';
-
-                if (!studentNo || !firstName) {
-                    // หากไม่มีเลขที่หรือชื่อจริง เก็บแถวที่ผิด
-                    errorRows.push(i + 1);
-                    continue;
-                }
-
-                // สร้าง entry ใหม่ใน Firebase
-                const newStudentRef = db.ref(`classes/${currentClassId}/students`).push();
-                const newStudentId = newStudentRef.key;
-                const setPromise = newStudentRef.set({
-                    firstName: firstName,
-                    lastName: lastName,
-                    studentNo: studentNo,
-                    createdAt: new Date().toISOString()
-                }).then(() => {
-                    // สร้างคะแนนเริ่มต้นให้ 0
-                    return db.ref(`classes/${currentClassId}/scores/${newStudentId}`).set({
-                        totalScore: 0,
-                        specialScore: 0
-                    });
-                });
-                importPromises.push(setPromise);
-            }
-
-            Promise.all(importPromises)
-            .then(() => {
-                if (errorRows.length) {
-                    alert(`นำเข้าข้อมูลเรียบร้อย แต่มีข้อผิดพลาดในแถว: ${errorRows.join(', ')} โปรดตรวจสอบแล้วนำเข้าใหม่`);
-                } else {
-                    alert('นำเข้าข้อมูลเรียบร้อยทั้งหมด');
-                }
-            })
-            .catch(err => {
-                console.error('Error importing CSV:', err);
-                alert('เกิดข้อผิดพลาดในการนำเข้า CSV');
-            });
-        }
-
-        // สร้างตัวอย่าง CSV (ภาษาไทย) พร้อม BOM เพื่อให้ Excel อ่านถูกต้อง
-        function setupSampleCSVDownload() {
-            const headers = ['เลขที่', 'ชื่อจริง', 'นามสกุล'];
-            const sampleRows = [
-                ['01', 'เพิ่มลาภ', 'ไพรีพินัย'],
-                ['02', 'ดวงใจ', 'อรุณรังษี']
-            ];
-            let csvContent = headers.join(',') + '\n';
-            sampleRows.forEach(row => {
-                csvContent += row.join(',') + '\n';
-            });
-
-            // เติม BOM (\uFEFF) ขึ้นต้น เพื่อให้ Excel อ่าน UTF-8 ได้ถูกต้อง
-            const bom = '\uFEFF';
-            const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const downloadLink = document.getElementById('downloadSampleBtn');
-            downloadLink.setAttribute('href', url);
-            downloadLink.setAttribute('download', 'template_นักเรียน.csv');
-        }
-    </script>
+      const bom = '\uFEFF';
+      const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const downloadLink = document.getElementById('downloadSampleBtn');
+      downloadLink.setAttribute('href', url);
+      downloadLink.setAttribute('download', 'template_นักเรียน.csv');
+    }
+  </script>
 </body>
 </html>

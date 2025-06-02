@@ -4,389 +4,63 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>เช็คชื่อ - ระบบจัดการชั้นเรียน</title>
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-  <style>
-    :root {
-      --primary-color: #4caf50;
-      --secondary-color: #2196f3;
-      --accent-color: #ffc107;
-      --danger-color: #f44336;
-      --info-color: #03a9f4;
-      --text-color: #333;
-      --light-text-color: #666;
-      --background-color: #f0f2f5;
-      --card-background: #ffffff;
-      --border-color: #e0e0e0;
-      --hover-light: #e3f2fd;
-      --sidebar-bg: #2c3e50;
-      --sidebar-text: #ecf0f1;
-      --sidebar-active-bg: #34495e;
-      --sidebar-hover-bg: #3a536b;
-
-      --status-green: #4caf50;
-      --status-yellow: #ffeb3b;
-      --status-blue: #2196f3;
-      --status-red: #f44336;
-      --status-orange: #ff9800;
-    }
-    body {
-      font-family: "Sarabun", sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: var(--background-color);
-      color: var(--text-color);
-      line-height: 1.6;
-      display: flex;
-      min-height: 100vh;
-    }
-    .sidebar {
-      width: 250px;
-      background-color: var(--sidebar-bg);
-      color: var(--sidebar-text);
-      padding: 20px 0;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      flex-shrink: 0;
-    }
-    .sidebar .logo-section {
-      display: flex;
-      align-items: center;
-      padding: 0 20px 30px 20px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      margin-bottom: 20px;
-    }
-    .sidebar .logo-icon {
-      font-size: 2.2rem;
-      color: var(--primary-color);
-      margin-right: 10px;
-    }
-    .sidebar .logo-text {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: var(--sidebar-text);
-    }
-    .sidebar nav ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      flex-grow: 1;
-    }
-    .sidebar nav ul li a {
-      display: flex;
-      align-items: center;
-      padding: 12px 20px;
-      color: var(--sidebar-text);
-      text-decoration: none;
-      font-weight: 600;
-      transition: background-color 0.3s ease, color 0.3s ease;
-      border-radius: 8px;
-      margin: 0 10px;
-    }
-    .sidebar nav ul li a .material-icons {
-      margin-right: 15px;
-      font-size: 1.5rem;
-    }
-    .sidebar nav ul li a:hover {
-      background-color: var(--sidebar-hover-bg);
-    }
-    .sidebar nav ul li a.active {
-      background-color: var(--sidebar-active-bg);
-      color: var(--primary-color);
-      box-shadow: inset 3px 0 0 var(--primary-color);
-    }
-    .sidebar .bottom-button {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 15px 20px;
-      margin: 20px;
-      background-color: var(--primary-color);
-      color: white;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    .sidebar .bottom-button .material-icons {
-      margin-right: 10px;
-      font-size: 1.6rem;
-    }
-    .sidebar .bottom-button:hover {
-      background-color: var(--sidebar-hover-bg);
-      transform: translateY(-2px);
-    }
-    .main-content {
-      flex-grow: 1;
-      padding: 30px;
-      display: flex;
-      flex-direction: column;
-      gap: 25px;
-      background-color: var(--background-color);
-    }
-    .header-section {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-    .btn-add-bill {
-      background-color: var(--secondary-color);
-      color: white;
-      padding: 10px 25px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 1rem;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      transition: background-color 0.3s ease;
-    }
-    .btn-add-bill:hover {
-      background-color: #1976d2;
-    }
-    .time-selection {
-      display: flex;
-      gap: 20px;
-      align-items: center;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 30px;
-      font-weight: 600;
-      color: var(--text-color);
-    }
-    .time-selection label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 600;
-      color: var(--text-color);
-    }
-    .time-selection input[type="date"] {
-      padding: 6px 10px;
-      border-radius: 6px;
-      border: 1px solid var(--border-color);
-      font-size: 1rem;
-    }
-    .time-selection .calendar-icon {
-      font-size: 24px;
-      color: var(--secondary-color);
-      vertical-align: middle;
-      user-select: none;
-    }
-    .btn-confirm-time {
-      background-color: var(--secondary-color);
-      color: white;
-      padding: 10px 30px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 700;
-      cursor: pointer;
-      font-size: 1rem;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      transition: background-color 0.3s ease;
-      margin-left: 10px;
-      white-space: nowrap;
-    }
-    .btn-confirm-time:hover {
-      background-color: #1976d2;
-    }
-    .attendance-table-container {
-      overflow-x: auto;
-      background-color: var(--card-background);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    }
-    table.attendance-table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 900px;
-    }
-    table.attendance-table th,
-    table.attendance-table td {
-      border: 1px solid var(--border-color);
-      padding: 10px 12px;
-      text-align: center;
-      white-space: nowrap;
-      vertical-align: middle;
-      font-weight: 600;
-    }
-    table.attendance-table th {
-      background-color: var(--background-color);
-      color: var(--text-color);
-      position: sticky;
-      top: 0;
-      z-index: 2;
-    }
-    table.attendance-table tbody tr:hover {
-      background-color: var(--hover-light);
-    }
-    .status-label {
-      font-weight: 700;
-      font-size: 0.85rem;
-      padding: 2px 0;
-      user-select: none;
-    }
-    .status-green {
-      color: var(--status-green);
-    }
-    .status-yellow {
-      color: var(--status-yellow);
-    }
-    .status-blue {
-      color: var(--status-blue);
-    }
-    .status-red {
-      color: var(--status-red);
-    }
-    .status-orange {
-      color: var(--status-orange);
-    }
-    input[type="checkbox"] {
-      width: 22px;
-      height: 22px;
-      cursor: pointer;
-      margin: 0;
-    }
-    input.status-green:checked {
-      accent-color: var(--status-green);
-    }
-    input.status-yellow:checked {
-      accent-color: var(--status-yellow);
-    }
-    input.status-blue:checked {
-      accent-color: var(--status-blue);
-    }
-    input.status-red:checked {
-      accent-color: var(--status-red);
-    }
-    input.status-orange:checked {
-      accent-color: var(--status-orange);
-    }
-    .student-no-cell {
-      font-weight: 700;
-      width: 80px;
-    }
-    .student-name-cell {
-      text-align: left;
-      padding-left: 12px;
-      min-width: 250px;
-      font-weight: 600;
-    }
-    .overview-section {
-      background: var(--card-background);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-      margin-top: 40px;
-    }
-    .overview-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-    .overview-header .title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 700;
-      font-size: 1.2rem;
-      color: var(--text-color);
-    }
-    .overview-header .title .material-icons {
-      font-size: 1.6rem;
-    }
-    .btn-download {
-      background-color: var(--secondary-color);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 8px 18px;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      transition: background-color 0.3s ease;
-    }
-    .btn-download:hover {
-      background-color: #1976d2;
-    }
-    #overviewTable {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 900px;
-    }
-    #overviewTable th,
-    #overviewTable td {
-      border: 1px solid var(--border-color);
-      padding: 8px;
-      font-weight: 600;
-      text-align: center;
-    }
-    #overviewTable th {
-      background-color: var(--background-color);
-      color: var(--text-color);
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    }
-    #overviewTable td:nth-child(2) {
-      text-align: left;
-      min-width: 250px;
-    }
-    #summaryFooter {
-      margin-top: 15px;
-      font-weight: 600;
-      color: var(--text-color);
-    }
-    @media (max-width: 768px) {
-      .time-selection {
-        flex-direction: column;
-        gap: 12px;
-      }
-      .btn-confirm-time {
-        margin-left: 0;
-        width: 100%;
-      }
-      table.attendance-table {
-        min-width: 600px;
-      }
-      .student-name-cell {
-        min-width: 150px;
-      }
-      #overviewTable {
-        min-width: 600px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="classroom.css" />
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
+    <button class="sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="สลับแถบข้าง">
+      <span class="material-icons">menu</span>
+    </button>
     <div class="logo-section">
       <span class="material-icons logo-icon">menu_book</span>
       <span class="logo-text">ระบบจัดการชั้นเรียน</span>
     </div>
     <nav>
       <ul>
-        <li><a href="index.html"><span class="material-icons">home</span>หน้าแรก</a></li>
-        <li><a href="class_management.html"><span class="material-icons">school</span>ห้องเรียน</a></li>
-        <li><a href="assignments.html" id="assignmentsLink"><span class="material-icons">assignment</span>มอบหมายงาน</a></li>
-        <li><a href="attendance.html" id="attendanceLink" class="active"><span class="material-icons">event_note</span>ข้อมูลการเข้าเรียน</a></li>
-        <li><a href="summary.html" id="summaryLink"><span class="material-icons">bar_chart</span>คะแนนรวม</a></li>
+        <li><a href="index.html"><span class="material-icons">home</span><span class="menu-label">หน้าแรก</span></a></li>
+        <li><a href="#" id="classLink"><span class="material-icons">school</span><span class="menu-label">ห้องเรียน</span></a></li>
+        <li><a href="#" id="assignmentsLink"><span class="material-icons">assignment</span><span class="menu-label">มอบหมายงาน</span></a></li>
+        <li><a href="#" id="attendanceLink" class="active"><span class="material-icons">event_note</span><span class="menu-label">ข้อมูลการเข้าเรียน</span></a></li>
+        <li><a href="#" id="summaryLink"><span class="material-icons">bar_chart</span><span class="menu-label">คะแนนรวม</span></a></li>
       </ul>
     </nav>
-    <a href="index.html" class="bottom-button">
-      <span class="material-icons">add_circle</span>
-      หน้าหลัก
-    </a>
+   
   </div>
 
   <div class="main-content">
-    <!-- ส่วนเช็คชื่อ (Attendance Page) -->
-    <div class="time-selection">
+  <!-- หัวเรื่องของหน้าเช็คชื่อ -->
+  <h2 class="section-title" style="font-size:1.6rem; font-weight:600; margin-bottom:16px; text-align:center;">
+    เช็คชื่อนักเรียน
+  </h2>
+
+  <div class="attendance-table-container">
+    <h2>เช็คชื่อนักเรียน</h2>
+    <table class="attendance-table" id="attendanceTable">
+      <thead>
+        <tr>
+          <th>เลขที่</th>
+          <th>รายชื่อ</th>
+          <th class="status-label status-green">เข้าเรียน</th>
+          <th class="status-label status-yellow">ลา</th>
+          <th class="status-label status-blue">ป่วย</th>
+          <th class="status-label status-red">ขาด</th>
+          <th class="status-label status-orange">สาย</th>
+        </tr>
+      </thead>
+      <tbody id="attendanceTableBody">
+        <tr>
+          <td colspan="7" style="text-align:center; color: var(--light-text-color)">
+            กำลังโหลดรายชื่อนักเรียน...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="time-selection" style="margin-top:24px;">
       <label>
         <span class="material-icons calendar-icon">calendar_today</span>
         วันที่
@@ -394,35 +68,8 @@
       </label>
       <button class="btn-confirm-time" id="btnSaveAttendance">บันทึกการเข้าเรียน</button>
     </div>
+  </div>
 
-    <div class="attendance-table-container">
-      <table class="attendance-table" id="attendanceTable">
-        <thead>
-          <tr>
-            <th>เลขที่</th>
-            <th>รายชื่อ</th>
-            <th><input type="checkbox" disabled style="accent-color: var(--status-green)" title="เข้าเรียน" /></th>
-            <th><input type="checkbox" disabled style="accent-color: var(--status-yellow)" title="ลา" /></th>
-            <th><input type="checkbox" disabled style="accent-color: var(--status-blue)" title="ป่วย" /></th>
-            <th><input type="checkbox" disabled style="accent-color: var(--status-red)" title="ขาด" /></th>
-            <th><input type="checkbox" disabled style="accent-color: var(--status-orange)" title="สาย" /></th>
-          </tr>
-          <tr>
-            <th colspan="2"></th>
-            <th class="status-label status-green">เข้าเรียน</th>
-            <th class="status-label status-yellow">ลา</th>
-            <th class="status-label status-blue">ป่วย</th>
-            <th class="status-label status-red">ขาด</th>
-            <th class="status-label status-orange">สาย</th>
-          </tr>
-        </thead>
-        <tbody id="attendanceTableBody">
-          <tr>
-            <td colspan="7" style="text-align:center; color: var(--light-text-color)">กำลังโหลดรายชื่อนักเรียน...</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
 
     <!-- ส่วนภาพรวม (Overview Section) -->
     <div class="overview-section">
@@ -438,7 +85,6 @@
           <tr>
             <th>เลขที่</th>
             <th style="text-align:left;">รายชื่อ</th>
-            <!-- วันที่บันทึกจะเพิ่มเป็นคอลัมน์ที่นี่ -->
           </tr>
         </thead>
         <tbody id="overviewTableBody">
@@ -453,430 +99,352 @@
     </div>
   </div>
 
-  <!-- สคริปต์ Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
-  <!-- สคริปต์จัดการ Attendance + Overview -->
+  <!-- สคริปต์จัดการ Sidebar Collapse -->
   <script>
-    // —————— ส่วน initialize Firebase และตัวแปรหลัก ——————
-    const firebaseConfig = {
-     apiKey: "AIzaSyCTyiR22AHeiKzI7Yr0g-V_dmdVPeh4ybo",
-      authDomain: "kru-digital.firebaseapp.com",
-      projectId: "kru-digital",
-      storageBucket: "kru-digital.firebasestorage.app",
-      messagingSenderId: "464969597852",
-      appId: "1:464969597852:web:7763a74cc042f231717e59"
-    };
-
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('collapsed');
     }
-    const db = firebase.database();
-
-    let currentClassId = "";
-    let studentsData = {};
-    let attendanceDates = [];
-
-    // —————— สร้างตัวช่วยและค่าคงที่ต่าง ๆ ——————
-    const STATUS_OPTIONS = [
-      { value: "present", label: "เข้าเรียน", color: "var(--status-green)" },
-      { value: "leave",   label: "ลา",     color: "var(--status-yellow)" },
-      { value: "sick",    label: "ป่วย",   color: "var(--status-blue)" },
-      { value: "absent",  label: "ขาด",    color: "var(--status-red)" },
-      { value: "late",    label: "สาย",    color: "var(--status-orange)" }
-    ];
-
-    /**
-     * สร้าง HTML ของ <select> สำหรับเลือกสถานะใหม่
-     * @param {string} studentId - ID ของนักเรียน
-     * @param {string} dateStr - วันที่ (format "YYYY-MM-DD")
-     * @param {string} currentStatus - สถานะปัจจุบัน
-     * @returns {HTMLElement} <select> element พร้อม event handler
-     */
-    function createStatusDropdown(studentId, dateStr, currentStatus) {
-      const selectEl = document.createElement("select");
-      selectEl.style.padding = "4px";
-      selectEl.style.borderRadius = "6px";
-      selectEl.style.border = "1px solid var(--border-color)";
-      selectEl.style.fontWeight = "600";
-      selectEl.style.minWidth = "80px";
-
-      STATUS_OPTIONS.forEach(opt => {
-        const option = document.createElement("option");
-        option.value = opt.value;
-        option.textContent = opt.label;
-        if (opt.value === currentStatus) option.selected = true;
-        selectEl.appendChild(option);
-      });
-
-      selectEl.onchange = async () => {
-        const newStatus = selectEl.value;
-        try {
-          // อัปเดตใน Firebase
-          await db.ref(`classes/${currentClassId}/attendance/${dateStr}/${studentId}`)
-                  .set(newStatus);
-
-          // แปลงกลับเป็น Badge ใหม่
-          const parentTd = selectEl.parentElement;
-          parentTd.innerHTML = getStatusBadgeHTML(newStatus, studentId, dateStr);
-        } catch (err) {
-          console.error("บันทึกสถานะไม่สำเร็จ:", err);
-          alert("เกิดข้อผิดพลาดในการบันทึกสถานะใหม่");
-          selectEl.value = currentStatus;
-        }
-      };
-
-      return selectEl;
-    }
-
-    /**
-     * ฟังก์ชันสร้าง Badge แสดงสถานะ พร้อมใส่ onclick เพื่อเปลี่ยนเป็น Dropdown
-     * @param {string} status - ค่าสถานะ (present, leave, sick, absent, late)
-     * @param {string} studentId
-     * @param {string} dateStr
-     * @returns {string} HTML string ของ <span> ที่มี onclick
-     */
-    function getStatusBadgeHTML(status, studentId, dateStr) {
-      const opt = STATUS_OPTIONS.find(o => o.value === status) || {};
-      const label = opt.label || status;
-      const color = opt.color || "gray";
-
-      return `
-        <span 
-          class="status-badge" 
-          style="display:inline-block; padding:4px 8px; border-radius:12px; 
-                 background-color:${color}; color:#333; font-weight:600; cursor:pointer;"
-          onclick="openDropdown('${studentId}', '${dateStr}', '${status}', this)"
-        >
-          ${label}
-        </span>
-      `;
-    }
-
-    /**
-     * ฟังก์ชันที่จะถูกเรียกเมื่อคลิกที่ Badge เพื่อลบ Badge ทิ้ง แล้วสร้าง <select> ขึ้นมาแทนที่
-     * @param {string} studentId
-     * @param {string} dateStr
-     * @param {string} currentStatus
-     * @param {HTMLElement} badgeEl - อ้างอิงถึง <span> ที่ถูกคลิก
-     */
-    function openDropdown(studentId, dateStr, currentStatus, badgeEl) {
-      const td = badgeEl.parentElement; // <td> ของสถานะ
-      td.innerHTML = ""; // เคลียร์เนื้อหาเดิม
-      const dropdown = createStatusDropdown(studentId, dateStr, currentStatus);
-      td.appendChild(dropdown);
-      dropdown.focus();
-    }
-
-    // —————— ฟังก์ชันช่วยเซ็ตหัวตาราง (วันที่) ——————
-    function renderOverviewTableHead() {
-      const thead = document.getElementById("overviewTableHead");
-      thead.innerHTML = `
-        <tr>
-          <th>เลขที่</th>
-          <th style="text-align:left;">รายชื่อ</th>
-          ${attendanceDates
-            .map(
-              (dateStr) =>
-                `<th title="${dateStr}">${formatDateDisplay(dateStr)}</th>`
-            )
-            .join("")}
-          <th>เปอร์เซ็นต์การเข้าเรียนทั้งหมด</th>
-          <th>เปอร์เซ็นต์การเข้าเรียนทั้งหมดเฉลี่ย</th>
-        </tr>
-      `;
-    }
-
-    // —————— ฟังก์ชันสร้างเนื้อหาตารางภาพรวม (Overview) ——————
-    async function renderOverviewTableBody() {
-      const tbody = document.getElementById("overviewTableBody");
-      tbody.innerHTML = "";
-      const studentIds = Object.keys(studentsData);
-      if (studentIds.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="${
-          2 + attendanceDates.length + 2
-        }" style="text-align:center; color: var(--light-text-color); padding: 15px;">ยังไม่มีข้อมูลนักเรียน</td></tr>`;
-        return;
-      }
-      studentIds.sort((a, b) => {
-        const noA = parseInt(studentsData[a].studentNo);
-        const noB = parseInt(studentsData[b].studentNo);
-        if (!isNaN(noA) && !isNaN(noB)) return noA - noB;
-        return (studentsData[a].firstName || "").localeCompare(
-          studentsData[b].firstName || ""
-        );
-      });
-
-      // ดึง attendance ของทุกวัน
-      const attendanceAll = {};
-      for (const dateStr of attendanceDates) {
-        const snap = await db
-          .ref(`classes/${currentClassId}/attendance/${dateStr}`)
-          .once("value");
-        attendanceAll[dateStr] = snap.val() || {};
-      }
-
-      for (const studentId of studentIds) {
-        const student = studentsData[studentId];
-        let rowHtml = `<tr>
-          <td style="font-weight:600;">${student.studentNo || "-"}</td>
-          <td style="text-align:left;">${student.firstName} ${student.lastName}</td>
-        `;
-
-        let totalPresent = 0;
-
-        attendanceDates.forEach((dateStr) => {
-          const status = attendanceAll[dateStr][studentId] || "absent";
-          if (status === "present") totalPresent++;
-          rowHtml += `<td>${ getStatusBadgeHTML(status, studentId, dateStr) }</td>`;
-        });
-
-        const percentAttendance =
-          ((totalPresent / attendanceDates.length) * 100) || 0;
-        rowHtml += `
-          <td style="font-weight:600;">${percentAttendance.toFixed(2)}%</td>
-          <td style="font-weight:600;">${percentAttendance.toFixed(2)}%</td>
-        </tr>`;
-
-        tbody.innerHTML += rowHtml;
-      }
-    }
-
-    // —————— ฟังก์ชันอื่น ๆ ที่จำเป็น (loadStudents, loadAttendanceDates, ฯลฯ) ——————
-    function setDefaultDate() {
-      const today = new Date().toISOString().slice(0, 10);
-      document.getElementById("classDate").value = today;
-    }
-
-    function getClassIdFromUrl() {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get("class") || "";
-    }
-
-    function setupSidebarLinks() {
-      const links = document.querySelectorAll(".sidebar nav ul li a");
-      links.forEach((link) => {
-        const href = link.getAttribute("href");
-        if (href && href !== "index.html") {
-          if (!href.includes("?class=")) {
-            link.setAttribute("href", `${href.split("?")[0]}?class=${currentClassId}`);
-          }
-        }
-      });
-      document.getElementById("assignmentsLink").href = `assignments.html?class=${currentClassId}`;
-      document.getElementById("attendanceLink").href = `attendance.html?class=${currentClassId}`;
-      document.getElementById("summaryLink").href = `summary.html?class=${currentClassId}`;
-    }
-
-    function loadSummaryFooter() {
-      document.getElementById("summaryFooter").textContent =
-        "จำนวนครูสอนทั้งหมด ที่เช็คชื่อในรายวิชา (10 คาบ) คาบ";
-    }
-
-    // โหลดรายชื่อนักเรียน และข้อมูลวันที่บันทึก
-    function loadStudents() {
-      if (!currentClassId) return;
-      db.ref(`classes/${currentClassId}/students`)
-        .once("value")
-        .then((snapshot) => {
-          studentsData = snapshot.val() || {};
-          renderAttendanceTable();      // ถ้าต้องการ load ตารางเช็คชื่อหน้า Attendance
-          loadAttendanceDates();
-        })
-        .catch(() => {
-          document.getElementById(
-            "attendanceTableBody"
-          ).innerHTML =
-            '<tr><td colspan="7" style="text-align:center; color: var(--danger-color)">เกิดข้อผิดพลาดในการโหลดรายชื่อนักเรียน</td></tr>';
-        });
-    }
-
-    function loadAttendanceDates() {
-      if (!currentClassId) return;
-      db.ref(`classes/${currentClassId}/attendance_dates`)
-        .once("value")
-        .then((snapshot) => {
-          attendanceDates = snapshot.val() || [];
-          attendanceDates.sort();
-          renderOverviewTableHead();
-          renderOverviewTableBody();
-          loadSummaryFooter();
-        })
-        .catch(() => {
-          attendanceDates = [];
-          renderOverviewTableHead();
-          renderOverviewTableBody();
-          document.getElementById("summaryFooter").textContent =
-            "ไม่สามารถโหลดข้อมูลจำนวนครูสอนได้";
-        });
-    }
-
-    // ฟังก์ชันแสดงตารางเช็คชื่อ (Attendance Table) หน้า Attendance — ไม่ได้เปลี่ยนแปลงจากเดิม
-    function renderAttendanceTable() {
-      const tbody = document.getElementById("attendanceTableBody");
-      tbody.innerHTML = "";
-      const studentIds = Object.keys(studentsData);
-
-      if (studentIds.length === 0) {
-        tbody.innerHTML =
-          '<tr><td colspan="7" style="text-align:center; color: var(--light-text-color);">ยังไม่มีนักเรียนในห้องเรียนนี้</td></tr>';
-        return;
-      }
-
-      studentIds.sort((a, b) => {
-        const noA = parseInt(studentsData[a].studentNo);
-        const noB = parseInt(studentsData[b].studentNo);
-        if (!isNaN(noA) && !isNaN(noB)) return noA - noB;
-        return (studentsData[a].firstName || "").localeCompare(
-          studentsData[b].firstName || ""
-        );
-      });
-
-      studentIds.forEach((studentId) => {
-        const student = studentsData[studentId];
-        const tr = document.createElement("tr");
-
-        // เลขที่
-        const tdNo = document.createElement("td");
-        tdNo.className = "student-no-cell";
-        tdNo.textContent = student.studentNo || "-";
-        tr.appendChild(tdNo);
-
-        // ชื่อ-นามสกุล
-        const tdName = document.createElement("td");
-        tdName.className = "student-name-cell";
-        tdName.textContent = `${student.firstName} ${student.lastName}`;
-        tr.appendChild(tdName);
-
-        // สถานะ 5 แบบ
-        const statuses = [
-          { className: "status-green", title: "เข้าเรียน", value: "present" },
-          { className: "status-yellow", title: "ลา", value: "leave" },
-          { className: "status-blue", title: "ป่วย", value: "sick" },
-          { className: "status-red", title: "ขาด", value: "absent" },
-          { className: "status-orange", title: "สาย", value: "late" },
-        ];
-
-        statuses.forEach(({ className, title, value }) => {
-          const td = document.createElement("td");
-          const checkbox = document.createElement("input");
-          const checkboxId = `${studentId}_status_${value}`;
-
-          checkbox.type = "checkbox";
-          checkbox.classList.add(className);
-          checkbox.title = title;
-          checkbox.name = `${studentId}_status`;
-          checkbox.value = value;
-          checkbox.id = checkboxId;
-
-          // จำกัดเลือกได้ช่องเดียวเหมือน radio
-          checkbox.onclick = () => {
-            const checkboxes = tr.querySelectorAll(
-              `input[name='${studentId}_status']`
-            );
-            checkboxes.forEach((cb) => {
-              if (cb !== checkbox) cb.checked = false;
-            });
-          };
-
-          td.appendChild(checkbox);
-
-          // ผูก label กับ checkbox
-          const label = document.createElement("label");
-          label.setAttribute("for", checkboxId);
-          label.style.display = "none";
-          td.appendChild(label);
-
-          tr.appendChild(td);
-        });
-
-        tbody.appendChild(tr);
-      });
-    }
-
-    // ฟังก์ชันบันทึกการเข้าเรียน (Attendance page)
-    async function saveAttendance() {
-      const selectedDate = document.getElementById("classDate").value;
-      if (!selectedDate) {
-        alert("กรุณาเลือกวันที่");
-        return;
-      }
-      const studentIds = Object.keys(studentsData);
-      if (studentIds.length === 0) {
-        alert("ไม่พบข้อมูลนักเรียน");
-        return;
-      }
-
-      const attendanceData = {};
-      const tbody = document.getElementById("attendanceTableBody");
-
-      for (const studentId of studentIds) {
-        const row = Array.from(tbody.querySelectorAll("tr")).find((tr) => {
-          return (
-            tr.querySelector(".student-no-cell").textContent ===
-              (studentsData[studentId].studentNo || "-") &&
-            tr.querySelector(".student-name-cell").textContent ===
-              `${studentsData[studentId].firstName} ${studentsData[studentId].lastName}`
-          );
-        });
-        if (!row) continue;
-
-        const checkboxes = row.querySelectorAll(`input[name='${studentId}_status']`);
-        let status = null;
-        checkboxes.forEach((cb) => {
-          if (cb.checked) status = cb.value;
-        });
-        if (!status) status = "absent";
-        attendanceData[studentId] = status;
-      }
-
-      try {
-        await db.ref(`classes/${currentClassId}/attendance/${selectedDate}`).set(
-          attendanceData
-        );
-
-        const datesRef = db.ref(`classes/${currentClassId}/attendance_dates`);
-        const snapshot = await datesRef.once("value");
-        let dates = snapshot.val() || [];
-        if (!dates.includes(selectedDate)) {
-          dates.push(selectedDate);
-          dates.sort();
-          await datesRef.set(dates);
-        }
-
-        alert("บันทึกการเข้าเรียนสำเร็จ");
-        loadAttendanceDates();
-      } catch (err) {
-        console.error(err);
-        alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
-      }
-    }
-
-    // format วันที่ให้แสดงภาษาไทยแบบ “DD MMM YYYY”
-    function formatDateDisplay(dateStr) {
-      const options = { year: "numeric", month: "short", day: "numeric" };
-      const dt = new Date(dateStr);
-      return dt.toLocaleDateString("th-TH", options);
-    }
-
-    // เมื่อหน้าโหลดเสร็จ
-    window.onload = () => {
-      currentClassId = getClassIdFromUrl();
-      if (!currentClassId) {
-        alert("ไม่พบ Class ID กรุณาเลือกห้องเรียนจากหน้าหลัก");
-        window.location.href = "index.html";
-        return;
-      }
-      setupSidebarLinks();
-      setDefaultDate();
-      loadStudents();
-    };
-
-    // เซ็ต event handler ให้ปุ่ม “บันทึกการเข้าเรียน”
-    document.getElementById("btnSaveAttendance").onclick = () => saveAttendance();
-    // ปุ่มดาวน์โหลด (ยังไม่ได้เขียนโค้ดดาวน์โหลดจริง)
-    document.getElementById("btnDownloadSummary").onclick = () => alert("ฟังก์ชันดาวน์โหลดยังไม่ทำ");
   </script>
+
+  <!-- *** Script Firebase และ Logic เช็คชื่อ + ภาพรวม พร้อม Dropdown สีตามสถานะ *** -->
+<script>
+  // ====== Firebase Config =====
+  const firebaseConfig = {
+    apiKey: "AIzaSyCTyiR22AHeiKzI7Yr0g-V_dmdVPeh4ybo",
+    authDomain: "kru-digital.firebaseapp.com",
+    projectId: "kru-digital",
+    storageBucket: "kru-digital.firebasestorage.app",
+    messagingSenderId: "464969597852",
+    appId: "1:464969597852:web:7763a74cc042f231717e59"
+  };
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  let currentClassId = "";
+  let studentsData = {};
+  let attendanceDates = [];
+
+  const STATUS_OPTIONS = [
+    { value: "present", label: "เข้าเรียน", color: "var(--status-green)" },
+    { value: "leave",   label: "ลา",     color: "var(--status-yellow)" },
+    { value: "sick",    label: "ป่วย",   color: "var(--status-blue)" },
+    { value: "absent",  label: "ขาด",    color: "var(--status-red)" },
+    { value: "late",    label: "สาย",    color: "var(--status-orange)" }
+  ];
+
+  // ---------- Sidebar Link Setup ----------
+  function setupSidebarLinks() {
+    const urlParams = new URLSearchParams(window.location.search);
+    currentClassId = urlParams.get("class") || "";
+    document.getElementById("classLink").href = `class_management.html?class=${currentClassId}`;
+    document.getElementById("assignmentsLink").href = `assignments.html?class=${currentClassId}`;
+    document.getElementById("attendanceLink").href = `attendance.html?class=${currentClassId}`;
+    document.getElementById("summaryLink").href = `summary.html?class=${currentClassId}`;
+  }
+
+  // ---------- Default Date ----------
+  function setDefaultDate() {
+    const today = new Date().toISOString().slice(0, 10);
+    document.getElementById("classDate").value = today;
+  }
+
+  // ---------- Load Students ----------
+  function loadStudents() {
+    if (!currentClassId) return;
+    db.ref(`classes/${currentClassId}/students`)
+      .once("value")
+      .then((snapshot) => {
+        studentsData = snapshot.val() || {};
+        renderAttendanceTable();
+        loadAttendanceDates();
+      })
+      .catch(() => {
+        document.getElementById("attendanceTableBody").innerHTML =
+          '<tr><td colspan="7" style="text-align:center; color: var(--danger-color)">เกิดข้อผิดพลาดในการโหลดรายชื่อนักเรียน</td></tr>';
+      });
+  }
+
+  // ---------- Load Attendance Dates ----------
+  function loadAttendanceDates() {
+    if (!currentClassId) return;
+    db.ref(`classes/${currentClassId}/attendance_dates`)
+      .once("value")
+      .then((snapshot) => {
+        attendanceDates = snapshot.val() || [];
+        attendanceDates.sort();
+        renderOverviewTableHead();
+        renderOverviewTableBody();
+        loadSummaryFooter();
+      })
+      .catch(() => {
+        attendanceDates = [];
+        renderOverviewTableHead();
+        renderOverviewTableBody();
+        document.getElementById("summaryFooter").textContent =
+          "ไม่สามารถโหลดข้อมูลจำนวนครูสอนได้";
+      });
+  }
+
+  // ---------- Attendance Table ----------
+  function renderAttendanceTable() {
+    const tbody = document.getElementById("attendanceTableBody");
+    tbody.innerHTML = "";
+    const studentIds = Object.keys(studentsData);
+
+    if (studentIds.length === 0) {
+      tbody.innerHTML =
+        '<tr><td colspan="7" style="text-align:center; color: var(--light-text-color);">ยังไม่มีนักเรียนในห้องเรียนนี้</td></tr>';
+      return;
+    }
+
+    studentIds.sort((a, b) => {
+      const noA = parseInt(studentsData[a].studentNo);
+      const noB = parseInt(studentsData[b].studentNo);
+      if (!isNaN(noA) && !isNaN(noB)) return noA - noB;
+      return (studentsData[a].firstName || "").localeCompare(studentsData[b].firstName || "");
+    });
+
+    studentIds.forEach((studentId) => {
+      const student = studentsData[studentId];
+      const tr = document.createElement("tr");
+      // เลขที่
+      const tdNo = document.createElement("td");
+      tdNo.className = "student-no-cell";
+      tdNo.textContent = student.studentNo || "-";
+      tr.appendChild(tdNo);
+      // ชื่อ-นามสกุล
+      const tdName = document.createElement("td");
+      tdName.className = "student-name-cell";
+      tdName.textContent = `${student.firstName} ${student.lastName}`;
+      tr.appendChild(tdName);
+      // สถานะ 5 แบบ
+      const statuses = [
+        { className: "status-green", title: "เข้าเรียน", value: "present" },
+        { className: "status-yellow", title: "ลา", value: "leave" },
+        { className: "status-blue", title: "ป่วย", value: "sick" },
+        { className: "status-red", title: "ขาด", value: "absent" },
+        { className: "status-orange", title: "สาย", value: "late" }
+      ];
+      statuses.forEach(({ className, title, value }) => {
+        const td = document.createElement("td");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.classList.add(className);
+        checkbox.title = title;
+        checkbox.name = `${studentId}_status`;
+        checkbox.value = value;
+        checkbox.onclick = () => {
+          const checkboxes = tr.querySelectorAll(`input[name='${studentId}_status']`);
+          checkboxes.forEach((cb) => {
+            if (cb !== checkbox) cb.checked = false;
+          });
+        };
+        td.appendChild(checkbox);
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ---------- Save Attendance ----------
+  async function saveAttendance() {
+    const selectedDate = document.getElementById("classDate").value;
+    if (!selectedDate) {
+      alert("กรุณาเลือกวันที่");
+      return;
+    }
+    const studentIds = Object.keys(studentsData);
+    if (studentIds.length === 0) {
+      alert("ไม่พบข้อมูลนักเรียน");
+      return;
+    }
+    const attendanceData = {};
+    const tbody = document.getElementById("attendanceTableBody");
+    studentIds.forEach((studentId) => {
+      const row = Array.from(tbody.querySelectorAll("tr")).find((tr) => {
+        return (
+          tr.querySelector(".student-no-cell").textContent === (studentsData[studentId].studentNo || "-") &&
+          tr.querySelector(".student-name-cell").textContent === `${studentsData[studentId].firstName} ${studentsData[studentId].lastName}`
+        );
+      });
+      if (!row) return;
+      const checkboxes = row.querySelectorAll(`input[name='${studentId}_status']`);
+      let status = null;
+      checkboxes.forEach((cb) => {
+        if (cb.checked) status = cb.value;
+      });
+      if (!status) status = "absent";
+      attendanceData[studentId] = status;
+    });
+    try {
+      await db.ref(`classes/${currentClassId}/attendance/${selectedDate}`).set(attendanceData);
+      const datesRef = db.ref(`classes/${currentClassId}/attendance_dates`);
+      const snapshot = await datesRef.once("value");
+      let dates = snapshot.val() || [];
+      if (!dates.includes(selectedDate)) {
+        dates.push(selectedDate);
+        dates.sort();
+        await datesRef.set(dates);
+      }
+      alert("บันทึกการเข้าเรียนสำเร็จ");
+      loadAttendanceDates();
+    } catch (err) {
+      console.error(err);
+      alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+    }
+  }
+
+  // ---------- ภาพรวม: Table Head ----------
+  function renderOverviewTableHead() {
+    const thead = document.getElementById("overviewTableHead");
+    thead.innerHTML = `
+      <tr>
+        <th>เลขที่</th>
+        <th style="text-align:left;">รายชื่อ</th>
+        ${attendanceDates
+          .map(
+            (dateStr) =>
+              `<th title="${dateStr}">${formatDateDisplay(dateStr)}</th>`
+          )
+          .join("")}
+        <th>เปอร์เซ็นต์การเข้าเรียนทั้งหมด</th>
+      </tr>
+    `;
+  }
+
+  // ---------- ภาพรวม: Table Body (Dropdowns พร้อมสี) ----------
+  async function renderOverviewTableBody() {
+    const tbody = document.getElementById("overviewTableBody");
+    tbody.innerHTML = "";
+    const studentIds = Object.keys(studentsData);
+    if (studentIds.length === 0) {
+      tbody.innerHTML = `<tr>
+        <td colspan="${2 + attendanceDates.length + 1}" style="text-align:center; color: var(--light-text-color); padding: 15px;">
+          ยังไม่มีข้อมูลนักเรียน
+        </td>
+      </tr>`;
+      return;
+    }
+    studentIds.sort((a, b) => {
+      const noA = parseInt(studentsData[a].studentNo);
+      const noB = parseInt(studentsData[b].studentNo);
+      if (!isNaN(noA) && !isNaN(noB)) return noA - noB;
+      return (studentsData[a].firstName || "").localeCompare(studentsData[b].firstName || "");
+    });
+    // ดึง attendance ของทุกวัน
+    const attendanceAll = {};
+    for (const dateStr of attendanceDates) {
+      const snap = await db
+        .ref(`classes/${currentClassId}/attendance/${dateStr}`)
+        .once("value");
+      attendanceAll[dateStr] = snap.val() || {};
+    }
+    // สร้างแต่ละแถว
+    studentIds.forEach((studentId) => {
+      const student = studentsData[studentId];
+      let totalPresent = 0;
+      const row = document.createElement("tr");
+      // เลขที่
+      const tdNo = document.createElement("td");
+      tdNo.style.fontWeight = "600";
+      tdNo.textContent = student.studentNo || "-";
+      row.appendChild(tdNo);
+      // ชื่อ-นามสกุล
+      const tdName = document.createElement("td");
+      tdName.style.textAlign = "left";
+      tdName.textContent = `${student.firstName} ${student.lastName}`;
+      row.appendChild(tdName);
+      // คอลัมน์สถานะแต่ละวัน (Dropdown)
+      attendanceDates.forEach((dateStr) => {
+        const tdStatus = document.createElement("td");
+        tdStatus.style.textAlign = "center";
+        const selectEl = document.createElement("select");
+        selectEl.style.padding = "4px";
+        selectEl.style.borderRadius = "6px";
+        selectEl.style.border = "1px solid var(--border-color)";
+        selectEl.style.fontWeight = "600";
+        selectEl.style.minWidth = "90px";
+        const savedStatus = attendanceAll[dateStr][studentId] || "absent";
+        STATUS_OPTIONS.forEach(opt => {
+          const option = document.createElement("option");
+          option.value = opt.value;
+          option.textContent = opt.label;
+          option.dataset.color = opt.color;
+          if (opt.value === savedStatus) {
+            option.selected = true;
+            selectEl.style.backgroundColor = opt.color;
+            selectEl.style.color = "#fff";
+          }
+          selectEl.appendChild(option);
+        });
+        selectEl.onchange = async () => {
+          const newStatus = selectEl.value;
+          const newColor = selectEl.querySelector(`option[value="${newStatus}"]`).dataset.color;
+          selectEl.style.backgroundColor = newColor;
+          selectEl.style.color = "#fff";
+          try {
+            await db.ref(`classes/${currentClassId}/attendance/${dateStr}/${studentId}`).set(newStatus);
+            // อัปเดตเปอร์เซ็นต์ท้ายแถว
+            let presentCount = 0;
+            attendanceDates.forEach(d => {
+              const status = (d === dateStr)
+                ? newStatus
+                : (attendanceAll[d][studentId] || "absent");
+              if (status === "present") presentCount++;
+            });
+            const newPercent = ((presentCount / attendanceDates.length) * 100).toFixed(2);
+            const tdPercentCell = row.querySelector(".percent-cell");
+            if (tdPercentCell) tdPercentCell.textContent = `${newPercent}%`;
+          } catch (err) {
+            console.error("Error updating status:", err);
+            alert("เกิดข้อผิดพลาดในการอัปเดตสถานะ");
+            // กลับไปสถานะเดิมใน UI
+            const previous = attendanceAll[dateStr][studentId] || "absent";
+            selectEl.value = previous;
+            const prevColor = selectEl.querySelector(`option[value="${previous}"]`).dataset.color;
+            selectEl.style.backgroundColor = prevColor;
+          }
+        };
+        tdStatus.appendChild(selectEl);
+        row.appendChild(tdStatus);
+        if (savedStatus === "present") totalPresent++;
+      });
+      // คอลัมน์เปอร์เซ็นต์
+      const percentAttendance = attendanceDates.length
+        ? ((totalPresent / attendanceDates.length) * 100).toFixed(2)
+        : "0.00";
+      const tdPercent = document.createElement("td");
+      tdPercent.style.fontWeight = "600";
+      tdPercent.className = "percent-cell";
+      tdPercent.textContent = `${percentAttendance}%`;
+      row.appendChild(tdPercent);
+
+      tbody.appendChild(row);
+    });
+  }
+
+  // ---------- Helper: Format Date ----------
+  function formatDateDisplay(dateStr) {
+    const options = { year: "numeric", month: "short", day: "numeric" };
+    const dt = new Date(dateStr);
+    return dt.toLocaleDateString("th-TH", options);
+  }
+
+  // ---------- ภาพรวม: สรุปท้ายตาราง ----------
+  function loadSummaryFooter() {
+    document.getElementById("summaryFooter").textContent =
+      "จำนวนครูสอนทั้งหมด ที่เช็คชื่อในรายวิชา (10 คาบ) คาบ";
+  }
+
+  // ---------- หน้าโหลดเสร็จ ----------
+  window.onload = () => {
+    setupSidebarLinks();
+    setDefaultDate();
+    loadStudents();
+    document.getElementById("btnSaveAttendance").onclick = () => saveAttendance();
+    document.getElementById("btnDownloadSummary").onclick = () => alert("ฟังก์ชันดาวน์โหลดยังไม่ทำ");
+  };
+</script>
+
 </body>
 </html>
