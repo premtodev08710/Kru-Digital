@@ -10,6 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
+     <link rel="stylesheet" href="classroom.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap&subset=thai"
       rel="stylesheet"
@@ -20,7 +21,7 @@
     />
 
     <!-- ====== CSS หลัก (classroom.css) ====== -->
-    <style>
+    <!-- <style>
       /* =======================
          นี่คือ CSS ส่วนสำคัญของหน้า (ย่อมาจาก classroom.css ของคุณ)
          ======================= */
@@ -40,8 +41,8 @@
         --sidebar-text: #ecf0f1;
         --sidebar-active-bg: #34495e;
         --sidebar-hover-bg: #3a536b;
-        --button-blue: #2196f3;
-        --button-blue-hover: #1976d2;
+        --button-blue: #2196F3;
+        --button-blue-hover: #1976D2;
       }
 
       * {
@@ -218,9 +219,12 @@
       /* ==== ส่วน “ใบเกรดราชการ” (Report Area) ==== */
       #reportArea {
         background-color: white;
-        padding: 12px;
+        padding: 12px; /* ลด padding ลง */
+        /* border: 1px solid #000;  ลบกรอบออกตามที่ขอ */
         max-width: 800px;
-        margin: 0 auto 20px;
+        margin: 0 auto 20px; /* ลด margin บางส่วนเพื่อให้ PDF ชิดขึ้น */
+
+        /* ตั้งค่า Sarabun สำหรับข้อความทั้งหมดในรายงาน */
         font-family: "Sarabun", sans-serif;
       }
       /* Header ของใบเกรดราชการ */
@@ -314,10 +318,10 @@
         }
         #reportArea {
           max-width: 100%;
-          padding: 16px;
+          padding: 8px; /* ย่อให้เล็กลงกว่าเดิมอีก ในหน้าจอเล็ก */
         }
       }
-    </style>
+    </style> -->
   </head>
 
   <body>
@@ -339,37 +343,23 @@
       <nav>
         <ul>
           <li>
-            <a href="index.html"
-              ><span class="material-icons">home</span>หน้าแรก</a
-            >
+            <a href="index.html"><span class="material-icons">home</span>หน้าแรก</a>
           </li>
           <li>
-            <a href="#" id="classLink"
-              ><span class="material-icons">school</span>ห้องเรียน</a
-            >
+            <a href="#" id="classLink"><span class="material-icons">school</span>ห้องเรียน</a>
           </li>
           <li>
-            <a href="#" id="assignmentsLink"
-              ><span class="material-icons">assignment</span>มอบหมายงาน</a
-            >
+            <a href="#" id="assignmentsLink"><span class="material-icons">assignment</span>มอบหมายงาน</a>
           </li>
           <li>
-            <a href="#" id="attendanceLink"
-              ><span class="material-icons">event_note</span
-              >ข้อมูลการเข้าเรียน</a
-            >
+            <a href="#" id="attendanceLink"><span class="material-icons">event_note</span>ข้อมูลการเข้าเรียน</a>
           </li>
           <li>
-            <a href="#" id="summaryLink" class="active"
-              ><span class="material-icons">bar_chart</span>คะแนนรวม</a
-            >
+            <a href="#" id="summaryLink" class="active"><span class="material-icons">bar_chart</span>คะแนนรวม</a>
           </li>
         </ul>
       </nav>
-      <a href="index.html" class="bottom-button">
-        <span class="material-icons">add_circle</span>
-        หน้าหลัก
-      </a>
+      
     </div>
 
     <!-- =======================
@@ -380,7 +370,7 @@
            ส่วน “ใบเกรดราชการ” (Report Area)
            จะถูกซ่อนไว้ เพราะเราต้องการให้ผู้ใช้กดปุ่มแล้วจึงแปลงเป็น PDF
            ======================= -->
-      <div id="reportArea" style="display: none">
+      <div id="reportArea" style="display: none;">
         <!-- 1) Header -->
         <div class="report-header">
           <img
@@ -393,7 +383,9 @@
             <div class="subline">
               ภาคเรียนที่ <u id="displaySemester">–/–</u>
             </div>
-            <div class="subline">ระดับชั้น <u id="displayGradeLevel">–</u></div>
+            <div class="subline">
+              ระดับชั้น <u id="displayGradeLevel">–</u>
+            </div>
           </div>
         </div>
         <!-- 2) ข้อมูลใต้ Header -->
@@ -454,11 +446,7 @@
       <div class="score-table-container">
         <h2>ตารางคะแนนงาน (รวมสัดส่วน)</h2>
         <!-- ปุ่มดาวน์โหลด CSV แบบเดิมที่คุณมี (ถ้ามี) -->
-        <button
-          id="btnDownloadExcel"
-          class="btn-download"
-          style="margin-bottom: 10px"
-        >
+        <button id="btnDownloadExcel" class="btn-download" style="margin-bottom: 10px;">
           <span class="material-icons">file_download</span>
           ดาวน์โหลด Excel
         </button>
@@ -471,10 +459,7 @@
           </thead>
           <tbody id="scoreTableBody">
             <tr>
-              <td
-                colspan="5"
-                style="text-align: center; color: var(--light-text-color)"
-              >
+              <td colspan="5" style="text-align: center; color: var(--light-text-color);">
                 กำลังโหลดข้อมูลนักเรียนและงาน...
               </td>
             </tr>
@@ -525,7 +510,7 @@
       let studentScores = {};
       let attendanceDates = [];
 
-      // ====== 3. เมื่อโหลด DOM เสร็จ ให้เริ่มอ่าน parameter ?class= และตั้ง listener ดึงข้อมูลจาก Firebase ======
+      // ====== 3. เมื่อโหลด DOM เสร็จ ให้ตั้ง href เมนูและตั้ง listener ดึงข้อมูลจาก Firebase ======
       document.addEventListener("DOMContentLoaded", () => {
         // อ่าน ?class=XXX จาก URL
         const params = new URLSearchParams(window.location.search);
@@ -535,25 +520,19 @@
           return;
         }
 
-        // ปรับลิงก์ใน Sidebar ให้ต่อท้าย ?class=
-        document.querySelectorAll(".sidebar nav ul li a").forEach((link) => {
-          const label = link.querySelector(".menu-label")?.textContent.trim();
-          if (label === "ห้องเรียน")
-            link.href = `class_management.html?class=${classId}`;
-          if (label === "มอบหมายงาน")
-            link.href = `assignments.html?class=${classId}`;
-          if (label === "ข้อมูลการเข้าเรียน")
-            link.href = `attendance.html?class=${classId}`;
-          if (label === "คะแนนรวม") link.href = `summary.html?class=${classId}`;
-        });
+        // ตั้ง href ของแต่ละลิงก์ใน Sidebar โดยใช้ ID
+        document.getElementById("classLink").href = `class_management.html?class=${classId}`;
+        document.getElementById("assignmentsLink").href = `assignments.html?class=${classId}`;
+        document.getElementById("attendanceLink").href = `attendance.html?class=${classId}`;
+        document.getElementById("summaryLink").href = `summary.html?class=${classId}`;
 
         // Listener: students
         db.ref(`classes/${classId}/students`).on(
           "value",
           (snap) => {
             studentsData = snap.val() || {};
-            renderScoreTable(); // (ตารางคะแนนของคุณ)
-            buildReportArea(); // (ใบเกรดราชการ)
+            renderScoreTable();    // (ตารางคะแนนของคุณ)
+            buildReportArea();     // (ใบเกรดราชการ)
           },
           (err) => console.error(err)
         );
@@ -600,14 +579,13 @@
       });
 
       // ====== 4. ฟังก์ชัน renderScoreTable() ======
-      // นี่คือโค้ดที่คุณมีอยู่เดิม สำหรับแสดง “ตารางคะแนนงาน (รวมสัดส่วน)” ในหน้าเว็บปกติ
       function renderScoreTable() {
         const headerRow = document.getElementById("scoreTableHeaderRow");
         const tableBody = document.getElementById("scoreTableBody");
         headerRow.innerHTML = "";
         tableBody.innerHTML = "";
 
-        // 1) หัวตาราง “ชื่องาน” (ลบ head เดิม ถ้ามี)
+        // 1) หัวตาราง “ชื่องาน” (ลบ head เดิม ถ้ามี) 
         const thNo = document.createElement("th");
         thNo.className = "no-cell";
         thNo.textContent = "ลำดับ";
@@ -618,13 +596,11 @@
         headerRow.appendChild(thName);
 
         // เรียง assignments ตาม createdAt
-        const sortedAssignmentIds = Object.keys(assignmentsData).sort(
-          (a, b) => {
-            const dA = new Date(assignmentsData[a].createdAt || 0);
-            const dB = new Date(assignmentsData[b].createdAt || 0);
-            return dA - dB;
-          }
-        );
+        const sortedAssignmentIds = Object.keys(assignmentsData).sort((a, b) => {
+          const dA = new Date(assignmentsData[a].createdAt || 0);
+          const dB = new Date(assignmentsData[b].createdAt || 0);
+          return dA - dB;
+        });
 
         sortedAssignmentIds.forEach((aid) => {
           const asg = assignmentsData[aid];
@@ -820,8 +796,8 @@
             db.ref(`classes/${classId}/assignments/${aid}/weightScore`)
               .set(val)
               .then(() => {
-                renderScoreTable(); // ตารางคะแนนต้นทาง
-                buildReportArea(); // ใบเกรดราชการ
+                renderScoreTable();    // ตารางคะแนนต้นทาง
+                buildReportArea();     // ใบเกรดราชการ
               })
               .catch((err) => {
                 console.error(err);
@@ -832,10 +808,7 @@
       }
 
       // ====== 7. ฟังก์ชัน buildReportArea() ======
-      // ฟังก์ชันนี้ทำหน้าที่ “ลากข้อมูลจาก Firebase” มาเติมลงใน
-      // <div id="reportArea"> … </div> ซึ่งเป็นโครงของ “ใบเกรดราชการ” (Government‐Style Transcript)
       function buildReportArea() {
-        // ถ้ายังไม่มีข้อมูลใดเลย ให้ return
         if (
           Object.keys(studentsData).length === 0 &&
           Object.keys(assignmentsData).length === 0 &&
@@ -848,15 +821,12 @@
         const container = document.getElementById("reportArea");
         container.style.display = "block"; // เปิดให้เราใช้ html2pdf ดึงไปแปลง
 
-        // 1) กรอกข้อมูลใต้ Header
-        // (ตัวอย่าง hardcode ภาคเรียน/ระดับชั้น คุณอาจเปลี่ยนให้ดึงจากฐานข้อมูลหรือใส่ฟิลด์ให้กรอกเองก็ได้)
+        // 1) กรอกข้อมูลใต้ Header 
         document.getElementById("displaySemester").textContent = "2/2566";
         document.getElementById("displayGradeLevel").textContent = "ปวช.2";
-        document.getElementById("displaySubject").textContent =
-          "ภาษาไทยพื้นฐาน";
+        document.getElementById("displaySubject").textContent = "ภาษาไทยพื้นฐาน";
         document.getElementById("displayTeacher").textContent = "นายสมชาย ใจดี";
-        document.getElementById("displayProgram").textContent =
-          "ปวช.2 การบัญชี";
+        document.getElementById("displayProgram").textContent = "ปวช.2 การบัญชี";
         document.getElementById("displaySubjectCode").textContent = "57220101";
 
         // 2) เติมตาราง <table class="grade-table" id="gradeTable"> ใหม่หมด
@@ -866,7 +836,6 @@
         tbody.innerHTML = "";
 
         // 2.1) หัวตาราง
-        // ลำดับ, เลขประจำตัว, ชื่อ–สกุล แล้วคอลัมน์ assignment ตามจำนวนใน assignmentsData
         const thNo = document.createElement("th");
         thNo.className = "no-cell";
         thNo.textContent = "ลำดับ";
@@ -881,14 +850,11 @@
         thName.textContent = "ชื่อ–สกุล";
         thead.appendChild(thName);
 
-        // เรียง assignments ตาม createdAt
-        const sortedAssignmentIds = Object.keys(assignmentsData).sort(
-          (a, b) => {
-            const dA = new Date(assignmentsData[a].createdAt || 0);
-            const dB = new Date(assignmentsData[b].createdAt || 0);
-            return dA - dB;
-          }
-        );
+        const sortedAssignmentIds = Object.keys(assignmentsData).sort((a, b) => {
+          const dA = new Date(assignmentsData[a].createdAt || 0);
+          const dB = new Date(assignmentsData[b].createdAt || 0);
+          return dA - dB;
+        });
         sortedAssignmentIds.forEach((aid) => {
           const asg = assignmentsData[aid];
           const weight = parseFloat(asg.weightScore) || asg.maxScore;
@@ -897,7 +863,6 @@
           thead.appendChild(th);
         });
 
-        // “คะแนนพิเศษ”, “รวม (100)”, “เกรด”, “% เข้าเรียน”
         const thSp = document.createElement("th");
         thSp.textContent = "คะแนนพิเศษ";
         thead.appendChild(thSp);
@@ -937,7 +902,7 @@
           return;
         }
 
-        // คำนวณ maxSpecialAll และ sumWeightAssignments ซ้ำเหมือนด้านบน
+        // คำนวณ maxSpecialAll และ sumWeightAssignments
         let maxSpecialAll = 0;
         sortedStudentIds.forEach((sid) => {
           const rawSp =
@@ -962,26 +927,22 @@
           const stu = studentsData[sid];
           const tr = document.createElement("tr");
 
-          // ลำดับ
           const tdNo = document.createElement("td");
           tdNo.className = "no-cell";
           tdNo.textContent = idx + 1;
           tdNo.style.fontWeight = "600";
           tr.appendChild(tdNo);
 
-          // เลขประจำตัว
           const tdId = document.createElement("td");
           tdId.className = "id-cell";
           tdId.textContent = stu.studentNo || "-";
           tr.appendChild(tdId);
 
-          // ชื่อ–สกุล
           const tdName = document.createElement("td");
           tdName.className = "name-cell";
           tdName.textContent = `${stu.firstName || ""} ${stu.lastName || ""}`;
           tr.appendChild(tdName);
 
-          // คะแนน assignments แต่ละงาน
           let sumAdjusted = 0;
           sortedAssignmentIds.forEach((aid) => {
             const asg = assignmentsData[aid];
@@ -1000,7 +961,6 @@
             tr.appendChild(tdAsg);
           });
 
-          // คะแนนพิเศษ
           const rawSp =
             studentScores[sid] && studentScores[sid].specialScore != null
               ? parseFloat(studentScores[sid].specialScore)
@@ -1011,7 +971,6 @@
           tdSp.textContent = safeSp.toFixed(2);
           tr.appendChild(tdSp);
 
-          // คำนวณ “รวม (เต็ม 100)”
           const denom = sumWeightAssignments + maxSpecialAll;
           const normalized = denom > 0 ? (sumAdjusted / denom) * 100 : 0;
           const clamped = normalized > 100 ? 100 : normalized;
@@ -1020,7 +979,6 @@
           tdTotal.className = "score-total-col";
           tr.appendChild(tdTotal);
 
-          // เกรด
           const tdGrade = document.createElement("td");
           tdGrade.textContent = calculateGrade(clamped);
           tdGrade.className = "score-total-col";
@@ -1029,7 +987,6 @@
             passedCount++;
           }
 
-          // % เข้าเรียน (สมมติ 100% เสมอ ถ้าไม่มีข้อมูลจริง ให้ปรับตรงนี้)
           const tdAttend = document.createElement("td");
           tdAttend.textContent = "100";
           tr.appendChild(tdAttend);
@@ -1037,10 +994,7 @@
           tbody.appendChild(tr);
         });
 
-        // สรุปผลด้านล่าง (แทรกตัวเลข)
-        document.getElementById(
-          "passedCount"
-        ).textContent = `${passedCount} คน`;
+        document.getElementById("passedCount").textContent = `${passedCount} คน`;
         document.getElementById("failedCount").textContent = `${
           totalCount - passedCount
         } คน`;
@@ -1048,21 +1002,23 @@
       }
 
       // ====== 8. เมื่อคลิก “ดาวน์โหลดใบเกรดราชการ (PDF)” ======
-      document
-        .getElementById("btnDownloadPdf")
-        .addEventListener("click", () => {
-          buildReportArea();
+      document.getElementById("btnDownloadPdf").addEventListener("click", () => {
+        buildReportArea();
 
-          const element = document.getElementById("reportArea");
-          const opt = {
-            margin: 0.2, // ลดจาก 0.5 เหลือ 0.2 นิ้ว
-            filename: `ใบเกรด_${new Date().toISOString().slice(0, 10)}.pdf`,
-            image: { type: "jpeg", quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
-          };
-          html2pdf().set(opt).from(element).save();
-        });
+        const element = document.getElementById("reportArea");
+        if (!element) {
+          alert("ไม่พบส่วนสำหรับแปลงเป็น PDF");
+          return;
+        }
+        const opt = {
+          margin: 0.2,         // ขอบ PDF ลดลง
+          filename: `ใบเกรด_${new Date().toISOString().slice(0, 10)}.pdf`,
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+        };
+        html2pdf().set(opt).from(element).save();
+      });
 
       // ====== 9. ฟังก์ชัน toggleSidebar() (คงเดิม) ======
       function toggleSidebar() {
