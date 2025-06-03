@@ -12,6 +12,10 @@
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet"
     />
+
+    <!-- สั่งโหลด SortableJS สำหรับลากสลับลำดับ -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
     <style>
       :root {
         --primary-color: #4caf50;
@@ -50,7 +54,7 @@
       .header {
         background-color: var(--header-bg);
         padding: 15px 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -85,7 +89,7 @@
         font-size: 1.1rem;
         font-weight: 600;
         transition: background-color 0.3s ease, transform 0.2s ease;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         display: flex;
         align-items: center;
         gap: 8px;
@@ -104,7 +108,7 @@
       .tab-navigation {
         background-color: var(--header-bg);
         padding: 10px 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         margin-bottom: 20px;
         display: flex;
         justify-content: center;
@@ -117,7 +121,9 @@
         border-radius: 8px;
         cursor: pointer;
         font-weight: 600;
-        transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        transition: background-color 0.3s ease,
+          color 0.3s ease,
+          box-shadow 0.3s ease;
         min-width: 120px;
         text-align: center;
         text-decoration: none;
@@ -126,7 +132,7 @@
       .tab-navigation .tab.active {
         background-color: var(--tab-active-bg);
         color: var(--tab-active-text);
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       }
 
       .tab-navigation .tab:not(.active) {
@@ -152,7 +158,7 @@
       .class-card {
         background-color: var(--card-background);
         border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         padding: 15px 20px;
         display: flex;
         flex-direction: column;
@@ -167,7 +173,7 @@
 
       .class-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
       }
 
       .card-header {
@@ -265,10 +271,12 @@
         display: none;
         position: fixed;
         z-index: 1000;
-        left: 0; top: 0;
-        width: 100%; height: 100%;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
         overflow: auto;
-        background-color: rgba(0,0,0,0.4);
+        background-color: rgba(0, 0, 0, 0.4);
         justify-content: center;
         align-items: center;
         animation: fadeIn 0.3s ease-out;
@@ -279,7 +287,7 @@
         margin: auto;
         padding: 30px;
         border-radius: 12px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         width: 90%;
         max-width: 480px;
         box-sizing: border-box;
@@ -360,8 +368,14 @@
       }
 
       @keyframes fadeIn {
-        from { opacity: 0; transform: scale(0.95); }
-        to { opacity: 1; transform: scale(1); }
+        from {
+          opacity: 0;
+          transform: scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
       }
 
       @media (max-width: 768px) {
@@ -415,9 +429,11 @@
         }
       }
     </style>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   </head>
+
   <body>
     <header class="header">
       <div class="logo-section">
@@ -512,6 +528,7 @@
       }
       const db = firebase.database();
 
+      // เก็บสถานะปัจจุบันของ tab ที่เลือก (active/achieved/pending)
       let currentClassStatus = "active";
 
       window.onload = () => {
@@ -519,6 +536,7 @@
         setupTabListeners();
       };
 
+      // ตั้ง listener ให้แต่ละ tab
       function setupTabListeners() {
         document.querySelectorAll(".tab-navigation .tab").forEach((tab) => {
           tab.addEventListener("click", (e) => {
@@ -533,6 +551,7 @@
         });
       }
 
+      // ฟังก์ชันโหลดข้อมูลห้องเรียนจาก Firebase
       function loadClasses(status) {
         const container = document.getElementById("classCardsContainer");
         container.innerHTML =
@@ -540,6 +559,7 @@
 
         const classesRef = db.ref("classes");
 
+        // ใช้ once เพื่อดึงข้อมูลครั้งเดียว และไม่ซ้ำ listener เก่า
         classesRef
           .once("value")
           .then((snapshot) => {
@@ -548,17 +568,37 @@
 
             let found = false;
             if (classesData) {
-              const filtered = Object.entries(classesData).filter(([id, c]) => {
-                const stat = c.status || "active";
-                return stat === status;
-              });
+              // แปลงเป็นอาเรย์ และกรองตามสถานะที่เลือก
+              const filtered = Object.entries(classesData).filter(
+                ([id, c]) => {
+                  const stat = c.status || "active";
+                  return stat === status;
+                }
+              );
 
               if (filtered.length) {
                 found = true;
-                filtered.sort(([, a], [, b]) =>
-                  (b.createdAt || "").localeCompare(a.createdAt || "")
-                );
 
+                // เรียงตาม field “order” (ถ้ามี) หรือ fallback ไปใช้ createdAt
+                filtered.sort(([, a], [, b]) => {
+                  const orderA = a.order != null ? a.order : null;
+                  const orderB = b.order != null ? b.order : null;
+
+                  if (orderA != null && orderB != null) {
+                    return orderA - orderB;
+                  } else if (orderA != null) {
+                    return -1;
+                  } else if (orderB != null) {
+                    return 1;
+                  }
+                  // ถ้าไม่มี order ให้ fallback ไปเรียงตาม createdAt
+                  return (
+                    (a.createdAt || "").localeCompare(b.createdAt || "")
+                  );
+                });
+
+                // หลังจากได้ลำดับที่ถูกต้องแล้ว
+                // ดึงค่าจำนวนคนมาพร้อมกัน
                 const promises = filtered.map(([id, c]) =>
                   db
                     .ref(`classes/${id}/students`)
@@ -573,6 +613,7 @@
                 );
 
                 Promise.all(promises).then((results) => {
+                  // สร้าง HTML แต่ละ card แล้ว append เข้า container
                   results.forEach(({ classId, classData, studentCount }) => {
                     container.innerHTML += createClassCard(
                       classId,
@@ -580,6 +621,9 @@
                       studentCount
                     );
                   });
+
+                  // หลัง append เสร็จ ค่อย init Sortable
+                  initDragAndDrop();
                 });
               }
             }
@@ -596,6 +640,7 @@
           });
       }
 
+      // แปลงสถานะเป็นภาษาไทย
       function getThaiStatus(status) {
         switch (status) {
           case "active":
@@ -609,6 +654,7 @@
         }
       }
 
+      // สร้าง HTML ของการ์ดแต่ละอัน พร้อม data-attribute สำหรับเก็บ classId
       function createClassCard(classId, classData, studentCount) {
         const classDisplayName = classData.name || "ชื่อวิชาไม่ระบุ";
         const classLevel = classData.level ? ` (${classData.level})` : "";
@@ -617,8 +663,9 @@
           : "";
         const classBandId = classData.bandId || "BANDID";
 
+        // ใส่ data-id ให้กับแต่ละ .class-card เพื่อเรียกใช้ใน Sortable
         return `
-          <div class="class-card">
+          <div class="class-card" data-id="${classId}">
             <div class="card-header">
               <div class="card-title-group">
                 <div class="class-name" title="${classDisplayName}">${classDisplayName}${classLevel}</div>
@@ -639,6 +686,7 @@
         `;
       }
 
+      // ฟังก์ชันเปิด modal เพื่อสร้างห้องเรียนใหม่
       function openCreateClassModal() {
         document.getElementById("createClassModal").style.display = "flex";
         document.getElementById("modalClassId").value = "";
@@ -658,6 +706,7 @@
         document.getElementById("createClassModal").style.display = "none";
       }
 
+      // สร้างห้องเรียนใหม่: เพิ่ม field 'order' ให้กม.ใหม่ ตามลำดับท้ายสุด
       function createClass() {
         const className = document
           .getElementById("modalClassName")
@@ -678,29 +727,48 @@
           return;
         }
 
-        const newClassRef = db.ref("classes").push();
-        newClassRef
-          .set({
-            name: className,
-            level: classLevel,
-            description: classDescription,
-            bandId:
-              classBandId ||
-              `B${newClassRef.key.substring(0, 5).toUpperCase()}`,
-            status: classStatus,
-            createdAt: new Date().toISOString(),
-          })
-          .then(() => {
-            alert("สร้างห้องเรียนสำเร็จ!");
-            closeCreateClassModal();
-            loadClasses(currentClassStatus);
-          })
-          .catch((error) => {
-            console.error("Error creating class: ", error);
-            alert("เกิดข้อผิดพลาดในการสร้างห้องเรียน");
+        // หา order สูงสุด ณ ปัจจุบัน (เฉพาะ status เดียวกัน) เพื่อเพิ่มลำดับรายการใหม่
+        db.ref("classes")
+          .once("value")
+          .then((snapshot) => {
+            const allClasses = snapshot.val() || {};
+            let maxOrder = -1;
+
+            // หา maxOrder ในกลุ่ม classes ทั้งหมด (หรือจะกรองเฉพาะ status เดียวกันก็ได้)
+            Object.values(allClasses).forEach((c) => {
+              if (c.order != null && c.order > maxOrder) {
+                maxOrder = c.order;
+              }
+            });
+
+            const newClassRef = db.ref("classes").push();
+            const newOrder = maxOrder + 1;
+
+            newClassRef
+              .set({
+                name: className,
+                level: classLevel,
+                description: classDescription,
+                bandId:
+                  classBandId ||
+                  `B${newClassRef.key.substring(0, 5).toUpperCase()}`,
+                status: classStatus,
+                createdAt: new Date().toISOString(),
+                order: newOrder,
+              })
+              .then(() => {
+                alert("สร้างห้องเรียนสำเร็จ!");
+                closeCreateClassModal();
+                loadClasses(currentClassStatus);
+              })
+              .catch((error) => {
+                console.error("Error creating class: ", error);
+                alert("เกิดข้อผิดพลาดในการสร้างห้องเรียน");
+              });
           });
       }
 
+      // แสดง modal เพื่อแก้ไขห้องเรียน
       function editClass(classId) {
         db.ref(`classes/${classId}`)
           .once("value")
@@ -737,6 +805,7 @@
           });
       }
 
+      // บันทึกการแก้ไขห้องเรียน (ไม่เปลี่ยนแปลง order)
       function saveEditedClass() {
         const classId = document.getElementById("modalClassId").value;
         const updatedName = document
@@ -776,6 +845,25 @@
             console.error("Error saving edited class: ", error);
             alert("เกิดข้อผิดพลาดในการบันทึกการแก้ไข");
           });
+      }
+
+      // ฟังก์ชันเริ่มต้น Sortable (ลากสลับลำดับได้)
+      function initDragAndDrop() {
+        const container = document.getElementById("classCardsContainer");
+        Sortable.create(container, {
+          animation: 150,
+          onEnd: (evt) => {
+            // เมื่อเลื่อนเสร็จ ให้อัปเดต field 'order' ใน Firebase
+            const cards = Array.from(
+              document.querySelectorAll(".class-card")
+            );
+            cards.forEach((cardElem, index) => {
+              const cid = cardElem.getAttribute("data-id");
+              // อัปเดตเฉพาะ order เท่านั้น
+              db.ref(`classes/${cid}`).update({ order: index });
+            });
+          },
+        });
       }
     </script>
   </body>
