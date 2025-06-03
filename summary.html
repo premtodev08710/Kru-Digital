@@ -3,61 +3,327 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>มอบหมายงาน - ระบบจัดการชั้นเรียน</title>
+    <title>ระบบจัดการชั้นเรียน - คะแนนรวม &amp; ใบเกรดราชการ</title>
+
+    <!-- ฟอนต์ Prompt + Sarabun (เพิ่ม Sarabun สำหรับ PDF) + Material Icons -->
     <link
       href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap&subset=thai"
       rel="stylesheet"
     />
     <link
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="classroom.css" />
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <!-- ====== CSS หลัก (classroom.css) ====== -->
     <style>
-      /* CSS สำหรับ <input class="weight-input"> และ <input disabled-weighted> */
-      .weight-input {
+      /* =======================
+         นี่คือ CSS ส่วนสำคัญของหน้า (ย่อมาจาก classroom.css ของคุณ)
+         ======================= */
+      :root {
+        --primary-color: #4caf50;
+        --secondary-color: #2196f3;
+        --accent-color: #ffc107;
+        --danger-color: #f44336;
+        --info-color: #03a9f4;
+        --text-color: #333;
+        --light-text-color: #666;
+        --background-color: #f0f2f5;
+        --card-background: #ffffff;
+        --border-color: #e0e0e0;
+        --hover-light: #e3f2fd;
+        --sidebar-bg: #2c3e50;
+        --sidebar-text: #ecf0f1;
+        --sidebar-active-bg: #34495e;
+        --sidebar-hover-bg: #3a536b;
+        --button-blue: #2196f3;
+        --button-blue-hover: #1976d2;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Prompt", sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* ==== SIDEBAR ==== */
+      .sidebar {
+        width: 250px;
+        background-color: var(--sidebar-bg);
+        color: var(--sidebar-text);
+        padding: 20px 0;
+        display: flex;
+        flex-direction: column;
+        transition: width 0.3s;
+      }
+      .sidebar.collapsed {
         width: 70px;
-        padding: 6px 8px;
+      }
+      .sidebar .sidebar-toggle-btn {
+        background: none;
+        border: none;
+        color: var(--sidebar-text);
+        font-size: 2rem;
+        margin-left: 15px;
+        margin-bottom: 18px;
+        cursor: pointer;
+      }
+      .sidebar .logo-section {
+        display: flex;
+        align-items: center;
+        padding: 0 20px 30px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 20px;
+      }
+      .sidebar .logo-icon {
+        font-size: 2.2rem;
+        color: var(--primary-color);
+        margin-right: 10px;
+      }
+      .sidebar .logo-text {
+        font-size: 1.3rem;
+        font-weight: 700;
+      }
+      .sidebar nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-grow: 1;
+      }
+      .sidebar nav ul li a {
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        color: var(--sidebar-text);
+        text-decoration: none;
+        font-weight: 600;
+        border-radius: 8px;
+        margin: 0 10px;
+        transition: background-color 0.3s;
+      }
+      .sidebar nav ul li a:hover {
+        background-color: var(--sidebar-hover-bg);
+      }
+      .sidebar nav ul li a.active {
+        background-color: var(--sidebar-active-bg);
+        color: var(--primary-color);
+      }
+      .sidebar .bottom-button {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 15px 20px;
+        margin: 20px;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background-color 0.3s;
+      }
+      .sidebar .bottom-button:hover {
+        background-color: #439d4a;
+      }
+
+      /* ==== MAIN CONTENT ==== */
+      .main-content {
+        flex-grow: 1;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+      }
+
+      /* ==== ปุ่มแบบคอมมอนท์ ==== */
+      .btn-download {
+        background-color: var(--button-blue);
+        color: #fff;
+        border: none;
         border-radius: 6px;
+        padding: 8px 16px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: background-color 0.2s;
+      }
+      .btn-download:hover {
+        background-color: var(--button-blue-hover);
+      }
+      .btn-download .material-icons {
+        font-size: 1.2rem;
+      }
+
+      /* ==== ตารางคะแนน (score-table) ==== */
+      .score-table-container {
+        overflow-x: auto;
+        background-color: var(--card-background);
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      }
+      .score-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 800px;
+      }
+      .score-table th,
+      .score-table td {
         border: 1px solid var(--border-color);
-        font-size: 0.9rem;
+        padding: 10px 12px;
         text-align: center;
+        font-weight: 600;
       }
-      .weight-input:focus {
-        outline: none;
-        box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.4);
+      .score-table th {
+        background-color: var(--background-color);
+        position: sticky;
+        top: 0;
+        z-index: 1;
       }
+      .score-table td.name-cell {
+        text-align: left;
+        padding-left: 12px;
+        font-weight: 600;
+      }
+      .score-table td.no-cell,
+      .score-table td.id-cell {
+        font-weight: 600;
+        padding: 8px;
+      }
+
+      /* ==== ช่อง input read-only สไตล์ที่ใช้ในตารางเพื่อแสดงคะแนนแบบ weighted ==== */
       .disabled-weighted {
         background-color: #f5f5f5;
         color: var(--light-text-color);
         border: 1px solid var(--border-color);
         border-radius: 6px;
-        padding: 6px;
-        width: 70px;
+        padding: 4px 6px;
+        width: 60px;
         text-align: center;
       }
-      .btn-download {
-        background-color: var(--secondary-color);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 8px 18px;
-        font-weight: 600;
-        cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        transition: background-color 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
+
+      /* ==== ส่วน “ใบเกรดราชการ” (Report Area) ==== */
+      #reportArea {
+        background-color: white;
+        padding: 12px;
+        max-width: 800px;
+        margin: 0 auto 20px;
+        font-family: "Sarabun", sans-serif;
       }
-      .btn-download:hover {
-        background-color: var(--button-blue-hover);
+      /* Header ของใบเกรดราชการ */
+      .report-header {
+        display: flex;
+        align-items: center;
+        border-bottom: 2px solid #000;
+        padding-bottom: 8px;
+        margin-bottom: 12px;
+      }
+      .report-header img.logo {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        margin-right: 12px;
+      }
+      .report-header .header-text {
+        flex-grow: 1;
+        text-align: center;
+      }
+      .report-header .header-text h1 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 4px;
+        letter-spacing: 0.5px;
+      }
+      .report-header .header-text .subline {
+        font-size: 0.95rem;
+        margin-bottom: 2px;
+      }
+      /* ข้อมูลด้านล่าง Header */
+      .report-info {
+        margin-bottom: 16px;
+      }
+      .report-info .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 6px;
+        font-size: 0.95rem;
+      }
+      .report-info label {
+        font-weight: 600;
+      }
+      /* ตารางผลการเรียน (ใบเกรดราชการ) */
+      .grade-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 16px;
+      }
+      .grade-table th,
+      .grade-table td {
+        border: 1px solid #000;
+        padding: 6px 8px;
+        text-align: center;
+        font-size: 0.9rem;
+      }
+      .grade-table th {
+        background-color: #f0f0f0;
+        font-weight: 600;
+      }
+      .grade-table td.name-cell {
+        text-align: left;
+        padding-left: 8px;
+      }
+      .grade-table td.no-cell {
+        width: 40px;
+      }
+      .grade-table td.id-cell {
+        width: 100px;
+      }
+      /* สรุปด้านล่าง */
+      .report-summary {
+        display: flex;
+        justify-content: flex-end;
+        gap: 40px;
+        font-size: 0.95rem;
+        margin-top: 12px;
+      }
+      .report-summary .summary-item {
+        text-align: right;
+      }
+      .report-summary .summary-item label {
+        font-weight: 600;
+        margin-right: 4px;
+      }
+
+      /* ==== Responsive (ย่อเล็กลงบ้าง) ==== */
+      @media (max-width: 768px) {
+        .score-table {
+          min-width: 600px;
+        }
+        #reportArea {
+          max-width: 100%;
+          padding: 16px;
+        }
       }
     </style>
   </head>
+
   <body>
+    <!-- =======================
+         SIDEBAR (คงเหมือนเดิมที่คุณใช้งาน)
+         ======================= -->
     <div class="sidebar" id="sidebar">
       <button
         class="sidebar-toggle-btn"
@@ -74,136 +340,229 @@
         <ul>
           <li>
             <a href="index.html"
-              ><span class="material-icons">home</span
-              ><span class="menu-label">หน้าแรก</span></a
+              ><span class="material-icons">home</span>หน้าแรก</a
             >
           </li>
           <li>
             <a href="#" id="classLink"
-              ><span class="material-icons">school</span
-              ><span class="menu-label">ห้องเรียน</span></a
+              ><span class="material-icons">school</span>ห้องเรียน</a
             >
           </li>
           <li>
             <a href="#" id="assignmentsLink"
-              ><span class="material-icons">assignment</span
-              ><span class="menu-label">มอบหมายงาน</span></a
+              ><span class="material-icons">assignment</span>มอบหมายงาน</a
             >
           </li>
           <li>
             <a href="#" id="attendanceLink"
               ><span class="material-icons">event_note</span
-              ><span class="menu-label">ข้อมูลการเข้าเรียน</span></a
+              >ข้อมูลการเข้าเรียน</a
             >
           </li>
           <li>
-            <a href="#" id="summaryLink"  class="active"
-              ><span class="material-icons">bar_chart</span
-              ><span class="menu-label">คะแนนรวม</span></a
+            <a href="#" id="summaryLink" class="active"
+              ><span class="material-icons">bar_chart</span>คะแนนรวม</a
             >
           </li>
         </ul>
       </nav>
-     
+      <a href="index.html" class="bottom-button">
+        <span class="material-icons">add_circle</span>
+        หน้าหลัก
+      </a>
     </div>
 
+    <!-- =======================
+         MAIN CONTENT
+         ======================= -->
     <div class="main-content">
-      <div class="assignment-table-section">
-        <h2>ตารางคะแนนงาน (รวมสัดส่วน)</h2>
-        <!-- ตัวอย่าง: วางปุ่มไว้ใต้ตารางคะแนน -->
-        <div class="score-table-container">
-          <button
-            id="btnDownloadExcel"
-            class="btn-download"
-            style="margin-bottom: 10px"
-          >
-            <span class="material-icons">file_download</span>
-            ดาวน์โหลด Excel
-          </button>
-          <table class="score-table" id="scoreTable">
-            <thead>
-              <tr id="scoreTableHeaderRow">
-                <!-- Dynamic Headers -->
-              </tr>
-            </thead>
-            <tbody id="scoreTableBody">
-              <tr>
-                <td
-                  colspan="5"
-                  style="text-align: center; color: var(--light-text-color)"
-                >
-                  กำลังโหลดข้อมูลนักเรียนและงาน...
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <!-- =======================
+           ส่วน “ใบเกรดราชการ” (Report Area)
+           จะถูกซ่อนไว้ เพราะเราต้องการให้ผู้ใช้กดปุ่มแล้วจึงแปลงเป็น PDF
+           ======================= -->
+      <div id="reportArea" style="display: none">
+        <!-- 1) Header -->
+        <div class="report-header">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/4/49/Seal_of_Bangkok.png"
+            alt="ตราโรงเรียน กทม."
+            class="logo"
+          />
+          <div class="header-text">
+            <h1>แบบรายงานผลการเรียนโรงเรียนวัดศาลาครืน</h1>
+            <div class="subline">
+              ภาคเรียนที่ <u id="displaySemester">–/–</u>
+            </div>
+            <div class="subline">ระดับชั้น <u id="displayGradeLevel">–</u></div>
+          </div>
         </div>
+        <!-- 2) ข้อมูลใต้ Header -->
+        <div class="report-info">
+          <div class="info-row">
+            <label>ชื่อวิชา :</label>
+            <span id="displaySubject">–</span>
+            <label>ครูผู้สอน :</label>
+            <span id="displayTeacher">–</span>
+          </div>
+          <div class="info-row">
+            <label>ระบบ :</label>
+            <span id="displayProgram">–</span>
+            <label>รหัสวิชา :</label>
+            <span id="displaySubjectCode">–</span>
+          </div>
+        </div>
+        <!-- 3) ตารางผลการเรียน -->
+        <table class="grade-table" id="gradeTable">
+          <thead>
+            <tr>
+              <th class="no-cell">ลำดับ</th>
+              <th class="id-cell">เลขประจำตัว</th>
+              <th>ชื่อ–สกุล</th>
+              <!-- (JS จะเติมคอลัมน์งานไดนามิกต่อไป) -->
+            </tr>
+          </thead>
+          <tbody id="gradeTableBody">
+            <tr>
+              <td
+                colspan="9"
+                style="text-align: center; color: var(--light-text-color)"
+              >
+                กำลังโหลดข้อมูล…
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- 4) สรุปผลด้านล่าง -->
+        <div class="report-summary">
+          <div class="summary-item">
+            <label>จำนวนผ่าน :</label><span id="passedCount">0 คน</span>
+          </div>
+          <div class="summary-item">
+            <label>จำนวนไม่ผ่าน :</label><span id="failedCount">0 คน</span>
+          </div>
+          <div class="summary-item">
+            <label>รวม :</label><span id="totalCount">0 คน</span>
+          </div>
+        </div>
+      </div>
 
-       
+      <!-- =======================
+           ส่วน “ตารางคะแนน” (Score Table) แบบเดิมที่คุณมีอยู่
+           ให้วางโค้ดตารางเดิมของคุณในนี้
+           ตัวอย่างโครงสร้างเว้นว่างไว้ก่อน ให้คุณดึงข้อมูลมาลงเอง
+           ======================= -->
+      <div class="score-table-container">
+        <h2>ตารางคะแนนงาน (รวมสัดส่วน)</h2>
+        <!-- ปุ่มดาวน์โหลด CSV แบบเดิมที่คุณมี (ถ้ามี) -->
+        <button
+          id="btnDownloadExcel"
+          class="btn-download"
+          style="margin-bottom: 10px"
+        >
+          <span class="material-icons">file_download</span>
+          ดาวน์โหลด Excel
+        </button>
+
+        <table class="score-table" id="scoreTable">
+          <thead>
+            <tr id="scoreTableHeaderRow">
+              <!-- JS จะสร้างหัวตาราง assignments ไดนามิกที่นี่ -->
+            </tr>
+          </thead>
+          <tbody id="scoreTableBody">
+            <tr>
+              <td
+                colspan="5"
+                style="text-align: center; color: var(--light-text-color)"
+              >
+                กำลังโหลดข้อมูลนักเรียนและงาน...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- =======================
+           ใต้ตารางคะแนน เพิ่มปุ่ม “ดาวน์โหลดใบเกรดราชการ (PDF)”
+           ======================= -->
+      <div class="button-container">
+        <button id="btnDownloadPdf" class="btn-download">
+          <span class="material-icons">picture_as_pdf</span>
+          ดาวน์โหลดใบเกรดราชการ (PDF)
+        </button>
       </div>
     </div>
 
+    <!-- =======================
+         ปิด MAIN CONTENT, เริ่ม SCRIPT
+         ======================= -->
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <!-- html2pdf.js (สำหรับแปลง HTML → PDF) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+
     <script>
-      // ===== Firebase Config =====
+      // ====== 1. Firebase Config (ปรับให้ตรงกับโปรเจกต์ของคุณ) ======
       const firebaseConfig = {
-        apiKey: "AIzaSyCTyiR22AHeiKzI7Yr0g-V_dmdVPeh4ybo",
+        apiKey: "AIzaSyCTyiR22AHeiKzI1Yr0g-V_dmdVPeh4ybo",
         authDomain: "kru-digital.firebaseapp.com",
         projectId: "kru-digital",
         storageBucket: "kru-digital.firebasestorage.app",
         messagingSenderId: "464969597852",
         appId: "1:464969597852:web:7763a74cc042f231717e59",
       };
-      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
       const db = firebase.database();
 
-      let currentClassId = "";
-      let studentsData = {}; // { studentId: { firstName, lastName, studentNo } }
-      let assignmentsData = {}; // { assignmentId: { name, maxScore, weightScore, createdAt } }
-      let studentScores = {}; // { studentId: { [assignmentId]: rawScore, specialScore: rawSpecial } }
+      // ====== 2. ตัวแปรเก็บข้อมูล ======
+      let classId = "";
+      let studentsData = {};
+      let assignmentsData = {};
+      let studentScores = {};
+      let attendanceDates = [];
 
-      window.onload = () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        currentClassId = urlParams.get("class") || "";
-        if (!currentClassId) {
-          alert("ไม่พบ Class ID กรุณาเลือกห้องเรียนจากหน้าหลัก");
-          window.location.href = "index.html";
+      // ====== 3. เมื่อโหลด DOM เสร็จ ให้เริ่มอ่าน parameter ?class= และตั้ง listener ดึงข้อมูลจาก Firebase ======
+      document.addEventListener("DOMContentLoaded", () => {
+        // อ่าน ?class=XXX จาก URL
+        const params = new URLSearchParams(window.location.search);
+        classId = params.get("class") || "";
+        if (!classId) {
+          alert("ไม่พบ Class ID กรุณาเรียกหน้านี้พร้อม ?class=รหัสห้องเรียน");
           return;
         }
 
-        // ปรับลิงก์ใน Sidebar ให้มี ?class={currentClassId}
+        // ปรับลิงก์ใน Sidebar ให้ต่อท้าย ?class=
         document.querySelectorAll(".sidebar nav ul li a").forEach((link) => {
           const label = link.querySelector(".menu-label")?.textContent.trim();
           if (label === "ห้องเรียน")
-            link.href = `class_management.html?class=${currentClassId}`;
+            link.href = `class_management.html?class=${classId}`;
           if (label === "มอบหมายงาน")
-            link.href = `assignments.html?class=${currentClassId}`;
+            link.href = `assignments.html?class=${classId}`;
           if (label === "ข้อมูลการเข้าเรียน")
-            link.href = `attendance.html?class=${currentClassId}`;
-          if (label === "คะแนนรวม")
-            link.href = `summary.html?class=${currentClassId}`;
+            link.href = `attendance.html?class=${classId}`;
+          if (label === "คะแนนรวม") link.href = `summary.html?class=${classId}`;
         });
 
-        // โหลดข้อมูลทั้งหมด
-        loadAllData(currentClassId);
-      };
-
-      function loadAllData(classId) {
-        // โหลดนักเรียน
+        // Listener: students
         db.ref(`classes/${classId}/students`).on(
           "value",
           (snap) => {
             studentsData = snap.val() || {};
-            renderScoreTable();
+            renderScoreTable(); // (ตารางคะแนนของคุณ)
+            buildReportArea(); // (ใบเกรดราชการ)
           },
           (err) => console.error(err)
         );
-
-        // โหลดมอบหมายงาน
+        // Listener: assignments
         db.ref(`classes/${classId}/assignments`).on(
           "value",
           (snap) => {
             assignmentsData = snap.val() || {};
-            // ถ้าไม่มี weightScore ให้ตั้งเป็น maxScore เริ่มต้น
+            // ถ้าไม่มี weightScore ให้ตั้งเป็น maxScore
             Object.entries(assignmentsData).forEach(([aid, asg]) => {
               if (asg.weightScore == null) {
                 assignmentsData[aid].weightScore = asg.maxScore;
@@ -213,38 +572,52 @@
               }
             });
             renderScoreTable();
+            buildReportArea();
           },
           (err) => console.error(err)
         );
-
-        // โหลดคะแนน
+        // Listener: scores
         db.ref(`classes/${classId}/scores`).on(
           "value",
           (snap) => {
             studentScores = snap.val() || {};
             renderScoreTable();
+            buildReportArea();
           },
           (err) => console.error(err)
         );
-      }
+        // Listener: attendance_dates
+        db.ref(`classes/${classId}/attendance_dates`).on(
+          "value",
+          (snap) => {
+            attendanceDates = snap.val() || [];
+            attendanceDates.sort();
+            renderScoreTable();
+            buildReportArea();
+          },
+          (err) => console.error(err)
+        );
+      });
 
+      // ====== 4. ฟังก์ชัน renderScoreTable() ======
+      // นี่คือโค้ดที่คุณมีอยู่เดิม สำหรับแสดง “ตารางคะแนนงาน (รวมสัดส่วน)” ในหน้าเว็บปกติ
       function renderScoreTable() {
         const headerRow = document.getElementById("scoreTableHeaderRow");
         const tableBody = document.getElementById("scoreTableBody");
         headerRow.innerHTML = "";
         tableBody.innerHTML = "";
 
-        // --- สร้าง Header ---
-        // (เพิ่มบรรทัดนี้ ก่อนบรรทัดที่สร้าง thName เดิม)
+        // 1) หัวตาราง “ชื่องาน” (ลบ head เดิม ถ้ามี)
         const thNo = document.createElement("th");
-        thNo.textContent = "เลขที่";
+        thNo.className = "no-cell";
+        thNo.textContent = "ลำดับ";
         headerRow.appendChild(thNo);
 
-        // เดิมมีบรรทัด:
         const thName = document.createElement("th");
         thName.textContent = "ชื่อนักเรียน";
         headerRow.appendChild(thName);
 
+        // เรียง assignments ตาม createdAt
         const sortedAssignmentIds = Object.keys(assignmentsData).sort(
           (a, b) => {
             const dA = new Date(assignmentsData[a].createdAt || 0);
@@ -256,55 +629,48 @@
         sortedAssignmentIds.forEach((aid) => {
           const asg = assignmentsData[aid];
           if (!asg) return;
-          const w = parseFloat(asg.weightScore) || 0;
+          const weight = parseFloat(asg.weightScore) || asg.maxScore;
           const th = document.createElement("th");
           th.className = "assignment-name-header";
           th.innerHTML = `
-          ${asg.name}<br>
-          (เดิม ${asg.maxScore} คะแนน)<br>
-          <label style="font-weight:600; font-size:0.9rem; margin-top:5px; display:block;">
-            คะแนนเต็มใหม่:
-            <input 
-              type="number" 
-              min="0" step="0.1"
-              value="${w}"
-              data-assignment-id="${aid}"
-              class="weight-input"
-            />
-          </label>
-        `;
+            ${asg.name} <br>
+            (เดิม ${asg.maxScore} คะแนน) <br>
+            <label style="font-weight:600; font-size:0.9rem; margin-top:5px; display:block;">
+              คะแนนเต็มใหม่:
+              <input
+                type="number"
+                min="0"
+                step="0.1"
+                value="${weight}"
+                data-assignment-id="${aid}"
+                class="weight-input"
+                style="width: 60px; margin-left: 6px;"
+              />
+            </label>
+          `;
           headerRow.appendChild(th);
         });
 
-        // หา maxSpecialAll
-        let maxSpecialAll = 0;
-        Object.keys(studentsData).forEach((sid) => {
-          const sp =
-            (studentScores[sid] && studentScores[sid].specialScore) != null
-              ? parseFloat(studentScores[sid].specialScore)
-              : 0;
-          if (sp > maxSpecialAll) maxSpecialAll = sp;
-        });
-
-        // เพิ่มหัวตาราง “คะแนนพิเศษ”
+        // เพิ่มคอลัมน์ “คะแนนพิเศษ”
         const thSpecial = document.createElement("th");
         thSpecial.textContent = "คะแนนพิเศษ";
-        thSpecial.className = "assignment-name-header";
         headerRow.appendChild(thSpecial);
-
-        // เพิ่มหัวตาราง “คะแนนรวม (เต็ม 100)”
+        // เพิ่มคอลัมน์ “รวม (เต็ม 100)”
         const thTotal = document.createElement("th");
-        thTotal.textContent = "คะแนนรวม (เต็ม 100)";
+        thTotal.textContent = "รวม (100)";
         thTotal.className = "score-total-col";
         headerRow.appendChild(thTotal);
-
-        // เพิ่มหัวตาราง “เกรด”
+        // เพิ่มคอลัมน์ “เกรด”
         const thGrade = document.createElement("th");
         thGrade.textContent = "เกรด";
         thGrade.className = "score-total-col";
         headerRow.appendChild(thGrade);
+        // เพิ่มคอลัมน์ “% เข้าเรียน”
+        const thAttend = document.createElement("th");
+        thAttend.textContent = "% เข้าเรียน";
+        headerRow.appendChild(thAttend);
 
-        // --- สร้าง Body ---
+        // ถ้าไม่มีนักเรียน
         const sortedStudentIds = Object.keys(studentsData).sort((a, b) => {
           const sa = studentsData[a],
             sb = studentsData[b];
@@ -313,46 +679,57 @@
           if (!isNaN(na) && !isNaN(nb)) return na - nb;
           return (sa.firstName || "").localeCompare(sb.firstName || "");
         });
-
-        // ถ้าไม่มีนักเรียน
         if (sortedStudentIds.length === 0) {
-          const colspan = sortedAssignmentIds.length + 3;
           tableBody.innerHTML = `
-          <tr>
-            <td colspan="${colspan}" style="text-align:center; color: var(--light-text-color);">
-              ยังไม่มีนักเรียนในห้องเรียนนี้
-            </td>
-          </tr>
-        `;
+            <tr>
+              <td colspan="${2 + sortedAssignmentIds.length + 3}"
+                  style="text-align: center; color: var(--light-text-color);">
+                ยังไม่มีนักเรียนในห้องเรียนนี้
+              </td>
+            </tr>
+          `;
           attachWeightListeners();
           return;
         }
 
-        // หาผลรวม weightScore ของ assignments
+        // คำนวณ maxSpecialAll
+        let maxSpecialAll = 0;
+        sortedStudentIds.forEach((sid) => {
+          const rawSp =
+            studentScores[sid] && studentScores[sid].specialScore != null
+              ? parseFloat(studentScores[sid].specialScore)
+              : 0;
+          if (rawSp > maxSpecialAll) maxSpecialAll = rawSp;
+        });
+        // ผลรวม weightAssignment ทั้งหมด
         let sumWeightAssignments = 0;
         sortedAssignmentIds.forEach((aid) => {
           sumWeightAssignments +=
-            parseFloat(assignmentsData[aid].weightScore) || 0;
+            parseFloat(assignmentsData[aid].weightScore) ||
+            assignmentsData[aid].maxScore;
         });
 
-        sortedStudentIds.forEach((sid) => {
+        // สร้างแต่ละแถว
+        sortedStudentIds.forEach((sid, index) => {
           const stu = studentsData[sid];
-          const row = tableBody.insertRow();
+          const row = document.createElement("tr");
           row.id = `studentRow-${sid}`;
 
-          // ชื่อนักเรียน
-          const noCell = row.insertCell();
-          noCell.textContent = stu.studentNo || "-";
-          noCell.style.fontWeight = "600";
-          noCell.style.textAlign = "center";
+          // 1) ลำดับ
+          const tdNo = document.createElement("td");
+          tdNo.textContent = index + 1;
+          tdNo.className = "no-cell";
+          tdNo.style.fontWeight = "600";
+          row.appendChild(tdNo);
 
-          // เดิมมีบรรทัด:
-          const nameCell = row.insertCell();
-          nameCell.className = "student-name-col";
-          nameCell.textContent = `${stu.firstName || ""} ${stu.lastName || ""}`;
+          // 2) ชื่อนักเรียน
+          const tdName = document.createElement("td");
+          tdName.textContent = `${stu.firstName || ""} ${stu.lastName || ""}`;
+          tdName.className = "name-cell";
+          row.appendChild(tdName);
+
+          // 3) คะแนนแต่ละ assignment
           let sumAdjusted = 0;
-
-          // แต่ละ assignment
           sortedAssignmentIds.forEach((aid) => {
             const asg = assignmentsData[aid];
             const maxScore = parseFloat(asg.maxScore) || 0;
@@ -365,53 +742,60 @@
             const adj = maxScore > 0 ? safeRaw * (weightScore / maxScore) : 0;
             sumAdjusted += adj;
 
-            const cell = row.insertCell();
+            const tdAsg = document.createElement("td");
             const input = document.createElement("input");
             input.type = "number";
             input.readOnly = true;
             input.className = "disabled-weighted";
             input.value = adj.toFixed(2);
-            cell.appendChild(input);
+            tdAsg.appendChild(input);
+            row.appendChild(tdAsg);
           });
 
-          // คะแนนพิเศษ
-          const rawSpecial =
+          // 4) คะแนนพิเศษ
+          const rawSp =
             studentScores[sid] && studentScores[sid].specialScore != null
               ? parseFloat(studentScores[sid].specialScore)
               : 0;
-          const safeSpecial =
-            rawSpecial > maxSpecialAll ? maxSpecialAll : rawSpecial;
-          const adjSpecial = maxSpecialAll > 0 ? safeSpecial : 0;
-          sumAdjusted += adjSpecial;
-
-          const specialCell = row.insertCell();
+          const safeSp = rawSp > maxSpecialAll ? maxSpecialAll : rawSp;
+          sumAdjusted += safeSp;
+          const tdSp = document.createElement("td");
           const spInput = document.createElement("input");
           spInput.type = "number";
           spInput.readOnly = true;
           spInput.className = "disabled-weighted";
-          spInput.value = adjSpecial.toFixed(2);
-          specialCell.appendChild(spInput);
+          spInput.value = safeSp.toFixed(2);
+          tdSp.appendChild(spInput);
+          row.appendChild(tdSp);
 
-          // คำนวณคะแนนรวม normalized to 100
+          // 5) คะแนนรวม (normalize to 100)
           const denom = sumWeightAssignments + maxSpecialAll;
           const normalized = denom > 0 ? (sumAdjusted / denom) * 100 : 0;
-          const totalCell = row.insertCell();
-          totalCell.className = "score-total-col";
-          totalCell.id = `totalScoreDisplay-${sid}`;
-          totalCell.textContent = `${Math.min(normalized, 100).toFixed(
-            2
-          )} / 100`;
+          const clamped = normalized > 100 ? 100 : normalized;
+          const tdTotal = document.createElement("td");
+          tdTotal.textContent = clamped.toFixed(2);
+          tdTotal.className = "score-total-col";
+          row.appendChild(tdTotal);
 
-          // เกรด
-          const gradeCell = row.insertCell();
-          gradeCell.className = "score-total-col";
-          const normClamped = Math.min(normalized, 100);
-          gradeCell.textContent = calculateGrade(normClamped);
+          // 6) เกรด
+          const tdGrade = document.createElement("td");
+          tdGrade.textContent = calculateGrade(clamped);
+          tdGrade.className = "score-total-col";
+          row.appendChild(tdGrade);
+
+          // 7) % เข้าเรียน (สมมติให้ 100% เสมอ ถ้าไม่มี data จริงให้ปรับเอง)
+          let attendPercent = 100;
+          const tdAttend = document.createElement("td");
+          tdAttend.textContent = attendPercent.toFixed(0);
+          row.appendChild(tdAttend);
+
+          tableBody.appendChild(row);
         });
 
         attachWeightListeners();
       }
 
+      // ====== 5. ฟังก์ชัน calculateGrade ======
       function calculateGrade(score) {
         if (score >= 80) return "4.0";
         if (score >= 75) return "3.5";
@@ -423,21 +807,21 @@
         return "0";
       }
 
+      // ====== 6. ฟังก์ชัน attachWeightListeners() ======
       function attachWeightListeners() {
         document.querySelectorAll(".weight-input").forEach((input) => {
           input.addEventListener("change", (e) => {
-            const assignmentId = e.target.dataset.assignmentId;
+            const aid = e.target.dataset.assignmentId;
             let val = parseFloat(e.target.value);
             if (isNaN(val) || val < 0) val = 0;
             e.target.value = val;
 
-            // บันทึก weightScore ใหม่ แล้ว render ใหม่ทั้งตาราง
-            db.ref(
-              `classes/${currentClassId}/assignments/${assignmentId}/weightScore`
-            )
+            // บันทึกลง Firebase แล้ว render ใหม่ทั้งตาราง + ใบเกรดราชการ
+            db.ref(`classes/${classId}/assignments/${aid}/weightScore`)
               .set(val)
               .then(() => {
-                renderScoreTable();
+                renderScoreTable(); // ตารางคะแนนต้นทาง
+                buildReportArea(); // ใบเกรดราชการ
               })
               .catch((err) => {
                 console.error(err);
@@ -447,76 +831,243 @@
         });
       }
 
-      // ฟังก์ชันแปลง <table> เป็น CSV string
-      function tableToCSV(tableElement) {
-        const rows = Array.from(tableElement.querySelectorAll("tr"));
-        const csvLines = rows.map((row) => {
-          const cells = Array.from(row.querySelectorAll("th, td"));
-          // ดึงแต่เนื้อหา text ของแต่ละเซลล์
-          const line = cells.map((cell) => {
-            let text = cell.textContent.trim();
-            // ถ้ามี input ภายใน ให้ดึงค่า value แทน textContent
-            const input = cell.querySelector("input");
-            if (input) {
-              text = input.value;
-            }
-            // ถ้ามี <br> ให้แทนที่ด้วยช่องว่าง
-            text = text.replace(/\r?\n|\r/g, " ");
-            // Escape เครื่องหมายจุลภาค / quote
-            if (
-              text.includes(",") ||
-              text.includes('"') ||
-              text.includes("\n")
-            ) {
-              text = '"' + text.replace(/"/g, '""') + '"';
-            }
-            return text;
-          });
-          return line.join(",");
-        });
-        return csvLines.join("\r\n");
-      }
+      // ====== 7. ฟังก์ชัน buildReportArea() ======
+      // ฟังก์ชันนี้ทำหน้าที่ “ลากข้อมูลจาก Firebase” มาเติมลงใน
+      // <div id="reportArea"> … </div> ซึ่งเป็นโครงของ “ใบเกรดราชการ” (Government‐Style Transcript)
+      function buildReportArea() {
+        // ถ้ายังไม่มีข้อมูลใดเลย ให้ return
+        if (
+          Object.keys(studentsData).length === 0 &&
+          Object.keys(assignmentsData).length === 0 &&
+          Object.keys(studentScores).length === 0 &&
+          attendanceDates.length === 0
+        ) {
+          return;
+        }
 
-      // ฟังก์ชันดาวน์โหลดไฟล์ CSV
-      function downloadCSV(csvContent, filename) {
-        const bom = "\uFEFF"; // ใส่ BOM เพื่อให้ Excel อ่านชื่อไทยได้ถูกต้อง
-        const blob = new Blob([bom + csvContent], {
-          type: "text/csv;charset=utf-8;",
-        });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = filename;
-        a.click();
-        URL.revokeObjectURL(url);
-      }
+        const container = document.getElementById("reportArea");
+        container.style.display = "block"; // เปิดให้เราใช้ html2pdf ดึงไปแปลง
 
-      // ผูก event ให้ปุ่มดาวน์โหลด
-      document.addEventListener("DOMContentLoaded", () => {
-        const btn = document.getElementById("btnDownloadExcel");
-        if (!btn) return;
+        // 1) กรอกข้อมูลใต้ Header
+        // (ตัวอย่าง hardcode ภาคเรียน/ระดับชั้น คุณอาจเปลี่ยนให้ดึงจากฐานข้อมูลหรือใส่ฟิลด์ให้กรอกเองก็ได้)
+        document.getElementById("displaySemester").textContent = "2/2566";
+        document.getElementById("displayGradeLevel").textContent = "ปวช.2";
+        document.getElementById("displaySubject").textContent =
+          "ภาษาไทยพื้นฐาน";
+        document.getElementById("displayTeacher").textContent = "นายสมชาย ใจดี";
+        document.getElementById("displayProgram").textContent =
+          "ปวช.2 การบัญชี";
+        document.getElementById("displaySubjectCode").textContent = "57220101";
 
-        btn.addEventListener("click", () => {
-          // หา element ตาราง (ในตัวอย่าง id="scoreTable")
-          const table = document.getElementById("scoreTable");
-          if (!table) {
-            alert("ไม่พบตารางคะแนน");
-            return;
+        // 2) เติมตาราง <table class="grade-table" id="gradeTable"> ใหม่หมด
+        const thead = document.querySelector("#gradeTable thead tr");
+        const tbody = document.getElementById("gradeTableBody");
+        thead.innerHTML = "";
+        tbody.innerHTML = "";
+
+        // 2.1) หัวตาราง
+        // ลำดับ, เลขประจำตัว, ชื่อ–สกุล แล้วคอลัมน์ assignment ตามจำนวนใน assignmentsData
+        const thNo = document.createElement("th");
+        thNo.className = "no-cell";
+        thNo.textContent = "ลำดับ";
+        thead.appendChild(thNo);
+
+        const thId = document.createElement("th");
+        thId.className = "id-cell";
+        thId.textContent = "เลขประจำตัว";
+        thead.appendChild(thId);
+
+        const thName = document.createElement("th");
+        thName.textContent = "ชื่อ–สกุล";
+        thead.appendChild(thName);
+
+        // เรียง assignments ตาม createdAt
+        const sortedAssignmentIds = Object.keys(assignmentsData).sort(
+          (a, b) => {
+            const dA = new Date(assignmentsData[a].createdAt || 0);
+            const dB = new Date(assignmentsData[b].createdAt || 0);
+            return dA - dB;
           }
-          // แปลงเป็น CSV
-          const csv = tableToCSV(table);
-          // ตั้งชื่อไฟล์ ตามวันเวลา หรือชื่อที่ต้องการ
-          const now = new Date();
-          const yyyy = now.getFullYear();
-          const mm = String(now.getMonth() + 1).padStart(2, "0");
-          const dd = String(now.getDate()).padStart(2, "0");
-          const hh = String(now.getHours()).padStart(2, "0");
-          const mi = String(now.getMinutes()).padStart(2, "0");
-          const filename = `คะแนนงาน_${yyyy}${mm}${dd}_${hh}${mi}.csv`;
-          // ดาวน์โหลดไฟล์
-          downloadCSV(csv, filename);
+        );
+        sortedAssignmentIds.forEach((aid) => {
+          const asg = assignmentsData[aid];
+          const weight = parseFloat(asg.weightScore) || asg.maxScore;
+          const th = document.createElement("th");
+          th.textContent = `${asg.name} (เต็ม ${weight})`;
+          thead.appendChild(th);
         });
-      });
+
+        // “คะแนนพิเศษ”, “รวม (100)”, “เกรด”, “% เข้าเรียน”
+        const thSp = document.createElement("th");
+        thSp.textContent = "คะแนนพิเศษ";
+        thead.appendChild(thSp);
+
+        const thTotal = document.createElement("th");
+        thTotal.textContent = "รวม (100)";
+        thTotal.className = "score-total-col";
+        thead.appendChild(thTotal);
+
+        const thGrade = document.createElement("th");
+        thGrade.textContent = "เกรด";
+        thGrade.className = "score-total-col";
+        thead.appendChild(thGrade);
+
+        const thAttend = document.createElement("th");
+        thAttend.textContent = "% เข้าเรียน";
+        thead.appendChild(thAttend);
+
+        // 2.2) ถ้าไม่มีนักเรียน
+        const sortedStudentIds = Object.keys(studentsData).sort((a, b) => {
+          const sa = studentsData[a],
+            sb = studentsData[b];
+          const na = parseInt(sa.studentNo),
+            nb = parseInt(sb.studentNo);
+          if (!isNaN(na) && !isNaN(nb)) return na - nb;
+          return (sa.firstName || "").localeCompare(sb.firstName || "");
+        });
+        if (sortedStudentIds.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="${3 + sortedAssignmentIds.length + 3}"
+                  style="text-align: center; color: var(--light-text-color);">
+                ยังไม่มีนักเรียนในระบบ
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        // คำนวณ maxSpecialAll และ sumWeightAssignments ซ้ำเหมือนด้านบน
+        let maxSpecialAll = 0;
+        sortedStudentIds.forEach((sid) => {
+          const rawSp =
+            studentScores[sid] && studentScores[sid].specialScore != null
+              ? parseFloat(studentScores[sid].specialScore)
+              : 0;
+          if (rawSp > maxSpecialAll) maxSpecialAll = rawSp;
+        });
+        let sumWeightAssignments = 0;
+        sortedAssignmentIds.forEach((aid) => {
+          sumWeightAssignments +=
+            parseFloat(assignmentsData[aid].weightScore) ||
+            assignmentsData[aid].maxScore;
+        });
+
+        // นับผ่าน/ไม่ผ่าน เพื่อสรุป
+        let passedCount = 0;
+        let totalCount = sortedStudentIds.length;
+
+        // 2.3) สร้างแถวนักเรียนทีละคน
+        sortedStudentIds.forEach((sid, idx) => {
+          const stu = studentsData[sid];
+          const tr = document.createElement("tr");
+
+          // ลำดับ
+          const tdNo = document.createElement("td");
+          tdNo.className = "no-cell";
+          tdNo.textContent = idx + 1;
+          tdNo.style.fontWeight = "600";
+          tr.appendChild(tdNo);
+
+          // เลขประจำตัว
+          const tdId = document.createElement("td");
+          tdId.className = "id-cell";
+          tdId.textContent = stu.studentNo || "-";
+          tr.appendChild(tdId);
+
+          // ชื่อ–สกุล
+          const tdName = document.createElement("td");
+          tdName.className = "name-cell";
+          tdName.textContent = `${stu.firstName || ""} ${stu.lastName || ""}`;
+          tr.appendChild(tdName);
+
+          // คะแนน assignments แต่ละงาน
+          let sumAdjusted = 0;
+          sortedAssignmentIds.forEach((aid) => {
+            const asg = assignmentsData[aid];
+            const maxScore = parseFloat(asg.maxScore) || 0;
+            const weightScore = parseFloat(asg.weightScore) || maxScore;
+            const raw =
+              studentScores[sid] && studentScores[sid][aid] != null
+                ? parseFloat(studentScores[sid][aid])
+                : 0;
+            const safeRaw = raw > maxScore ? maxScore : raw;
+            const adj = maxScore > 0 ? safeRaw * (weightScore / maxScore) : 0;
+            sumAdjusted += adj;
+
+            const tdAsg = document.createElement("td");
+            tdAsg.textContent = adj.toFixed(2);
+            tr.appendChild(tdAsg);
+          });
+
+          // คะแนนพิเศษ
+          const rawSp =
+            studentScores[sid] && studentScores[sid].specialScore != null
+              ? parseFloat(studentScores[sid].specialScore)
+              : 0;
+          const safeSp = rawSp > maxSpecialAll ? maxSpecialAll : rawSp;
+          sumAdjusted += safeSp;
+          const tdSp = document.createElement("td");
+          tdSp.textContent = safeSp.toFixed(2);
+          tr.appendChild(tdSp);
+
+          // คำนวณ “รวม (เต็ม 100)”
+          const denom = sumWeightAssignments + maxSpecialAll;
+          const normalized = denom > 0 ? (sumAdjusted / denom) * 100 : 0;
+          const clamped = normalized > 100 ? 100 : normalized;
+          const tdTotal = document.createElement("td");
+          tdTotal.textContent = clamped.toFixed(2);
+          tdTotal.className = "score-total-col";
+          tr.appendChild(tdTotal);
+
+          // เกรด
+          const tdGrade = document.createElement("td");
+          tdGrade.textContent = calculateGrade(clamped);
+          tdGrade.className = "score-total-col";
+          tr.appendChild(tdGrade);
+          if (parseFloat(calculateGrade(clamped)) > 0) {
+            passedCount++;
+          }
+
+          // % เข้าเรียน (สมมติ 100% เสมอ ถ้าไม่มีข้อมูลจริง ให้ปรับตรงนี้)
+          const tdAttend = document.createElement("td");
+          tdAttend.textContent = "100";
+          tr.appendChild(tdAttend);
+
+          tbody.appendChild(tr);
+        });
+
+        // สรุปผลด้านล่าง (แทรกตัวเลข)
+        document.getElementById(
+          "passedCount"
+        ).textContent = `${passedCount} คน`;
+        document.getElementById("failedCount").textContent = `${
+          totalCount - passedCount
+        } คน`;
+        document.getElementById("totalCount").textContent = `${totalCount} คน`;
+      }
+
+      // ====== 8. เมื่อคลิก “ดาวน์โหลดใบเกรดราชการ (PDF)” ======
+      document
+        .getElementById("btnDownloadPdf")
+        .addEventListener("click", () => {
+          buildReportArea();
+
+          const element = document.getElementById("reportArea");
+          const opt = {
+            margin: 0.2, // ลดจาก 0.5 เหลือ 0.2 นิ้ว
+            filename: `ใบเกรด_${new Date().toISOString().slice(0, 10)}.pdf`,
+            image: { type: "jpeg", quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
+          };
+          html2pdf().set(opt).from(element).save();
+        });
+
+      // ====== 9. ฟังก์ชัน toggleSidebar() (คงเดิม) ======
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("collapsed");
+      }
     </script>
   </body>
 </html>
