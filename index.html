@@ -1,533 +1,624 @@
 <!DOCTYPE html>
 <html lang="th">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>หน้าแรก - ระบบจัดการชั้นเรียน</title>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-    <style>
-        :root {
-            --primary-color: #4caf50;
-            --secondary-color: #2196f3;
-            --accent-color: #ffc107;
-            --text-color: #333;
-            --light-text-color: #666;
-            --background-color: #f0f2f5;
-            --card-background: #ffffff;
-            --border-color: #e0e0e0;
-            --hover-light: #e3f2fd;
-            --header-bg: #ffffff;
-            --nav-button-bg: #4caf50;
-            --nav-button-hover-bg: #43a047;
-            --tab-active-bg: #2196f3;
-            --tab-inactive-bg: #e0e0e0;
-            --tab-active-text: #fff;
-            --tab-inactive-text: #666;
-            --button-blue: #2196f3;
-            --button-blue-hover: #1976d2;
-            --danger-color: #f44336;
-        }
-        body {
-            font-family: 'Sarabun', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        .header {
-            background-color: var(--header-bg);
-            padding: 15px 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .header .logo-section {
-            display: flex;
-            align-items: center;
-        }
-        .header .logo-icon {
-            font-size: 2.5rem;
-            color: var(--primary-color);
-            margin-right: 10px;
-        }
-        .header .logo-text {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-color);
-        }
-        .header .create-class-button {
-            background-color: var(--nav-button-bg);
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-weight: 600;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-        }
-        .header .create-class-button:hover {
-            background-color: var(--nav-button-hover-bg);
-            transform: translateY(-2px);
-        }
-        .header .create-class-button .material-icons {
-            font-size: 1.4rem;
-        }
-        .tab-navigation {
-            background-color: var(--header-bg);
-            padding: 10px 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .tab-navigation .tab {
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
-            min-width: 120px;
-            text-align: center;
-            text-decoration: none;
-        }
-        .tab-navigation .tab.active {
-            background-color: var(--tab-active-bg);
-            color: var(--tab-active-text);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .tab-navigation .tab:not(.active) {
-            background-color: var(--tab-inactive-bg);
-            color: var(--tab-inactive-text);
-        }
-        .tab-navigation .tab:not(.active):hover {
-            background-color: var(--hover-light);
-            color: var(--secondary-color);
-        }
-        .main-content {
-            flex-grow: 1;
-            padding: 20px;
-            max-width: 1300px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 20px;
-        }
-        .class-card {
-            background-color: var(--card-background);
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            padding: 15px 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            border: 1px solid var(--border-color);
-            min-height: 140px;
-        }
-        .class-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 10px;
-        }
-        .card-title-group {
-            flex-grow: 1;
-            overflow: hidden;
-        }
-        .class-name {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 3px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .class-id {
-            font-size: 0.85rem;
-            color: var(--light-text-color);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .card-icons {
-            display: flex;
-            gap: 10px;
-            margin-left: 15px;
-        }
-        .card-icons .material-icons {
-            font-size: 1.5rem;
-            color: var(--secondary-color);
-            cursor: pointer;
-            transition: color 0.2s ease;
-        }
-        .card-icons .material-icons:hover {
-            color: var(--primary-color);
-        }
-        .student-count {
-            font-size: 0.9rem;
-            color: var(--light-text-color);
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .student-count .material-icons {
-            font-size: 1.2rem;
-            color: var(--primary-color);
-        }
-        .enter-class-button {
-            background-color: var(--button-blue);
-            color: white;
-            padding: 10px 18px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 600;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            text-decoration: none;
-            text-align: center;
-            align-self: flex-start;
-            margin-top: auto;
-        }
-        .enter-class-button:hover {
-            background-color: var(--button-blue-hover);
-            transform: translateY(-1px);
-        }
-        .footer {
-            text-align: center;
-            padding: 20px;
-            margin-top: 30px;
-            color: var(--light-text-color);
-            font-size: 0.9rem;
-            border-top: 1px solid var(--border-color);
-        }
-        #createClassModal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0; top: 0;
-            width: 100%; height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn 0.3s ease-out;
-        }
-        #createClassModal > div {
-            background-color: #fefefe;
-            margin: auto;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            width: 90%;
-            max-width: 480px;
-            box-sizing: border-box;
-        }
-        #createClassModal h2 {
-            color: var(--secondary-color);
-            margin-top: 0;
-            margin-bottom: 20px;
-            text-align: center;
-            border-bottom: none;
-        }
-        #createClassModal label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--text-color);
-        }
-        #createClassModal input[type="text"],
-        #createClassModal textarea,
-        #createClassModal select {
-            width: calc(100% - 24px);
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 1rem;
-            box-sizing: border-box;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-        #createClassModal input[type="text"]:focus,
-        #createClassModal textarea:focus,
-        #createClassModal select:focus {
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
-            outline: none;
-        }
-        #createClassModal textarea {
-            resize: vertical;
-        }
-        #createClassModal .button-group {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        #createClassModal .button-group button {
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-        #createClassModal .button-group button:first-child {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        #createClassModal .button-group button:first-child:hover {
-            background-color: var(--nav-button-hover-bg);
-        }
-        #createClassModal .button-group button:last-child {
-            background-color: #6c757d;
-            color: white;
-        }
-        #createClassModal .button-group button:last-child:hover {
-            background-color: #5a6268;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                align-items: flex-start;
-                padding: 10px 15px;
-                gap: 10px;
-            }
-            .header .create-class-button {
-                width: 100%;
-                justify-content: center;
-                margin-top: 10px;
-                padding: 10px 15px;
-                font-size: 1rem;
-            }
-            .tab-navigation {
-                padding: 10px 15px;
-                flex-direction: column;
-                gap: 8px;
-            }
-            .tab-navigation .tab {
-                width: 100%;
-                min-width: unset;
-                padding: 10px 15px;
-            }
-            .main-content {
-                padding: 15px;
-                grid-template-columns: 1fr;
-            }
-            .class-card {
-                padding: 18px;
-            }
-            .class-name {
-                font-size: 1.2rem;
-            }
-            .class-id {
-                font-size: 0.85rem;
-            }
-            .card-icons .material-icons {
-                font-size: 1.6rem;
-            }
-            .enter-class-button {
-                padding: 10px 15px;
-            }
-            #createClassModal > div {
-                padding: 20px;
-            }
-            #createClassModal h2 {
-                font-size: 1.5rem;
-            }
-        }
-    </style>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+  <style>
+    :root {
+    --primary-color: #4caf50;
+    --secondary-color: #2196f3;
+    --accent-color: #ffc107;
+    --text-color: #333;
+    --light-text-color: #666;
+    --background-color: #f0f2f5;
+    --card-background: #ffffff;
+    --border-color: #e0e0e0;
+    --hover-light: #e3f2fd;
+    --header-bg: #ffffff;
+    --nav-button-bg: #4caf50;
+    --nav-button-hover-bg: #43a047;
+    --tab-active-bg: #2196f3;
+    --tab-inactive-bg: #e0e0e0;
+    --tab-active-text: #fff;
+    --tab-inactive-text: #666;
+    --button-blue: #2196f3;
+    --button-blue-hover: #1976d2;
+    --danger-color: #f44336;
+}
+
+body {
+    font-family: 'Sarabun', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.header {
+    background-color: var(--header-bg);
+    padding: 15px 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.header .logo-section {
+    display: flex;
+    align-items: center;
+}
+
+.header .logo-icon {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-right: 10px;
+}
+
+.header .logo-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.header .create-class-button {
+    background-color: var(--nav-button-bg);
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.header .create-class-button:hover {
+    background-color: var(--nav-button-hover-bg);
+    transform: translateY(-2px);
+}
+
+.header .create-class-button .material-icons {
+    font-size: 1.4rem;
+}
+
+.tab-navigation {
+    background-color: var(--header-bg);
+    padding: 10px 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tab-navigation .tab {
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    min-width: 120px;
+    text-align: center;
+    text-decoration: none;
+}
+
+.tab-navigation .tab.active {
+    background-color: var(--tab-active-bg);
+    color: var(--tab-active-text);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.tab-navigation .tab:not(.active) {
+    background-color: var(--tab-inactive-bg);
+    color: var(--tab-inactive-text);
+}
+
+.tab-navigation .tab:not(.active):hover {
+    background-color: var(--hover-light);
+    color: var(--secondary-color);
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    max-width: 1300px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.class-card {
+    background-color: var(--card-background);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    padding: 15px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid var(--border-color);
+
+    /* บังคับให้เป็นจัตุรัส */
+    aspect-ratio: 1 / 1;
+    overflow: hidden; /* กรณีเนื้อหาล้นออกมา */
+}
+
+.class-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.card-title-group {
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.class-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.class-id {
+    font-size: 0.85rem;
+    color: var(--light-text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-icons {
+    display: flex;
+    gap: 10px;
+    margin-left: 15px;
+}
+
+.card-icons .material-icons {
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.card-icons .material-icons:hover {
+    color: var(--primary-color);
+}
+
+.student-count {
+    font-size: 0.9rem;
+    color: var(--light-text-color);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.student-count .material-icons {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+}
+
+.enter-class-button {
+    background-color: var(--button-blue);
+    color: white;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-decoration: none;
+    text-align: center;
+    align-self: flex-start;
+    margin-top: auto;
+}
+
+.enter-class-button:hover {
+    background-color: var(--button-blue-hover);
+    transform: translateY(-1px);
+}
+
+.footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 30px;
+    color: var(--light-text-color);
+    font-size: 0.9rem;
+    border-top: 1px solid var(--border-color);
+}
+
+#createClassModal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+#createClassModal > div {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    width: 90%;
+    max-width: 480px;
+    box-sizing: border-box;
+}
+
+#createClassModal h2 {
+    color: var(--secondary-color);
+    margin-top: 0;
+    margin-bottom: 20px;
+    text-align: center;
+    border-bottom: none;
+}
+
+#createClassModal label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+#createClassModal input[type="text"],
+#createClassModal textarea,
+#createClassModal select {
+    width: calc(100% - 24px);
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#createClassModal input[type="text"]:focus,
+#createClassModal textarea:focus,
+#createClassModal select:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+    outline: none;
+}
+
+#createClassModal textarea {
+    resize: vertical;
+}
+
+#createClassModal .button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+#createClassModal .button-group button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#createClassModal .button-group button:first-child {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+#createClassModal .button-group button:first-child:hover {
+    background-color: var(--nav-button-hover-bg);
+}
+
+#createClassModal .button-group button:last-child {
+    background-color: #6c757d;
+    color: white;
+}
+
+#createClassModal .button-group button:last-child:hover {
+    background-color: #5a6268;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 15px;
+        gap: 10px;
+    }
+    .header .create-class-button {
+        width: 100%;
+        justify-content: center;
+        margin-top: 10px;
+        padding: 10px 15px;
+        font-size: 1rem;
+    }
+    .tab-navigation {
+        padding: 10px 15px;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .tab-navigation .tab {
+        width: 100%;
+        min-width: unset;
+        padding: 10px 15px;
+    }
+    .main-content {
+        /* ที่หน้าจอเล็ก จะลดเหลือคอลัมน์เดียว เพื่อไม่ให้ overflow */
+        grid-template-columns: 1fr;
+        padding: 15px;
+    }
+    .class-card {
+        padding: 18px;
+    }
+    .class-name {
+        font-size: 1.2rem;
+    }
+    .class-id {
+        font-size: 0.85rem;
+    }
+    .card-icons .material-icons {
+        font-size: 1.6rem;
+    }
+    .enter-class-button {
+        padding: 10px 15px;
+    }
+    #createClassModal > div {
+        padding: 20px;
+    }
+    #createClassModal h2 {
+        font-size: 1.5rem;
+    }
+}
+
+  </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-</head>
-<body>
+  </head>
+  <body>
     <header class="header">
-        <div class="logo-section">
-            <span class="material-icons logo-icon">menu_book</span>
-            <span class="logo-text">ระบบจัดการชั้นเรียน</span>
-        </div>
-        <a href="#" class="create-class-button" onclick="openCreateClassModal()">
-            <span class="material-icons">add_circle</span>
-            สร้างห้องเรียน
-        </a>
+      <div class="logo-section">
+        <span class="material-icons logo-icon">menu_book</span>
+        <span class="logo-text">ระบบจัดการชั้นเรียน</span>
+      </div>
+      <a href="#" class="create-class-button" onclick="openCreateClassModal()">
+        <span class="material-icons">add_circle</span>
+        สร้างห้องเรียน
+      </a>
     </header>
 
     <nav class="tab-navigation">
-        <a href="#" class="tab active" data-status="active">Active</a>
-        <a href="#" class="tab" data-status="achieved">Achieved</a>
-        <a href="#" class="tab" data-status="pending">Pending review</a>
+      <a href="#" class="tab active" data-status="active">Active</a>
+      <a href="#" class="tab" data-status="achieved">Achieved</a>
+      <a href="#" class="tab" data-status="pending">Pending review</a>
     </nav>
 
     <main class="main-content" id="classCardsContainer">
-        <p style="grid-column: 1 / -1; text-align: center; color: var(--light-text-color);">กำลังโหลดห้องเรียน...</p>
+      <p
+        style="
+          grid-column: 1 / -1;
+          text-align: center;
+          color: var(--light-text-color);
+        "
+      >
+        กำลังโหลดห้องเรียน...
+      </p>
     </main>
 
     <div id="createClassModal">
-        <div>
-            <h2 id="createEditModalTitle">สร้างห้องเรียนใหม่</h2>
-            <input type="hidden" id="modalClassId" />
-            <label for="modalClassName">ชื่อวิชา / รายชื่อวิชา:</label>
-            <input type="text" id="modalClassName" placeholder="เช่น บ.3 วิทยาศาสตร์คำนวณ" required />
+      <div>
+        <h2 id="createEditModalTitle">สร้างห้องเรียนใหม่</h2>
+        <input type="hidden" id="modalClassId" />
+        <label for="modalClassName">ชื่อวิชา / รายชื่อวิชา:</label>
+        <input
+          type="text"
+          id="modalClassName"
+          placeholder="เช่น บ.3 วิทยาศาสตร์คำนวณ"
+          required
+        />
 
-            <label for="modalClassLevel">ระดับชั้น:</label>
-            <input type="text" id="modalClassLevel" placeholder="เช่น ป.5, ม.3" required />
+        <label for="modalClassLevel">ระดับชั้น:</label>
+        <input
+          type="text"
+          id="modalClassLevel"
+          placeholder="เช่น ป.5, ม.3"
+          required
+        />
 
-            <label for="modalClassDescription">คำอธิบาย (ไม่บังคับ):</label>
-            <textarea id="modalClassDescription" placeholder="เพิ่มรายละเอียดเกี่ยวกับวิชา" rows="3"></textarea>
+        <label for="modalClassDescription">คำอธิบาย (ไม่บังคับ):</label>
+        <textarea
+          id="modalClassDescription"
+          placeholder="เพิ่มรายละเอียดเกี่ยวกับวิชา"
+          rows="3"
+        ></textarea>
 
-            <label for="modalClassBandId">BANDID (ไม่บังคับ):</label>
-            <input type="text" id="modalClassBandId" placeholder="เช่น BANDIDXYZ" />
+        <label for="modalClassBandId">ชื่อครู (ไม่บังคับ):</label>
+        <input type="text" id="modalClassBandId" placeholder="เช่น BANDIDXYZ" />
 
-            <label for="modalClassStatus">สถานะห้องเรียน:</label>
-            <select id="modalClassStatus">
-                <option value="active">Active</option>
-                <option value="achieved">Achieved</option>
-                <option value="pending">Pending review</option>
-            </select>
+        <label for="modalClassStatus">สถานะห้องเรียน:</label>
+        <select id="modalClassStatus">
+          <option value="active">Active</option>
+          <option value="achieved">Achieved</option>
+          <option value="pending">Pending review</option>
+        </select>
 
-            <div class="button-group">
-                <button id="createEditModalButton" onclick="createClass()">สร้าง</button>
-                <button onclick="closeCreateClassModal()">ยกเลิก</button>
-            </div>
+        <div class="button-group">
+          <button id="createEditModalButton" onclick="createClass()">
+            สร้าง
+          </button>
+          <button onclick="closeCreateClassModal()">ยกเลิก</button>
         </div>
+      </div>
     </div>
 
     <footer class="footer">© 2024 ระบบจัดการชั้นเรียน. สงวนลิขสิทธิ์.</footer>
 
     <script>
-        const firebaseConfig = {
-           apiKey: "AIzaSyCTyiR22AHeiKzI7Yr0g-V_dmdVPeh4ybo",
-      authDomain: "kru-digital.firebaseapp.com",
-      projectId: "kru-digital",
-      storageBucket: "kru-digital.firebasestorage.app",
-      messagingSenderId: "464969597852",
-      appId: "1:464969597852:web:7763a74cc042f231717e59",
-            measurementId: "G-ERDZ2Q5BFZ"
-        };
+      const firebaseConfig = {
+        apiKey: "AIzaSyCTyiR22AHeiKzI7Yr0g-V_dmdVPeh4ybo",
+        authDomain: "kru-digital.firebaseapp.com",
+        projectId: "kru-digital",
+        storageBucket: "kru-digital.firebasestorage.app",
+        messagingSenderId: "464969597852",
+        appId: "1:464969597852:web:7763a74cc042f231717e59",
+        measurementId: "G-ERDZ2Q5BFZ",
+      };
 
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const db = firebase.database();
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+      const db = firebase.database();
 
-        let currentClassStatus = 'active';
-        let classesData = {};
+      let currentClassStatus = "active";
+      let classesData = {};
 
-        window.onload = () => {
+      window.onload = () => {
+        loadClasses(currentClassStatus);
+        setupTabListeners();
+      };
+
+      function setupTabListeners() {
+        document.querySelectorAll(".tab-navigation .tab").forEach((tab) => {
+          tab.addEventListener("click", (e) => {
+            e.preventDefault();
+            document
+              .querySelectorAll(".tab-navigation .tab")
+              .forEach((t) => t.classList.remove("active"));
+            e.target.classList.add("active");
+            currentClassStatus = e.target.dataset.status;
             loadClasses(currentClassStatus);
-            setupTabListeners();
-        };
+          });
+        });
+      }
 
-        function setupTabListeners() {
-            document.querySelectorAll('.tab-navigation .tab').forEach(tab => {
-                tab.addEventListener('click', e => {
-                    e.preventDefault();
-                    document.querySelectorAll('.tab-navigation .tab').forEach(t => t.classList.remove('active'));
-                    e.target.classList.add('active');
-                    currentClassStatus = e.target.dataset.status;
-                    loadClasses(currentClassStatus);
+      function loadClasses(status) {
+        const container = document.getElementById("classCardsContainer");
+        container.innerHTML =
+          '<p style="grid-column: 1 / -1; text-align: center; color: var(--light-text-color);">กำลังโหลดห้องเรียน...</p>';
+
+        const classesRef = db.ref("classes");
+        classesRef.on(
+          "value",
+          (snapshot) => {
+            classesData = snapshot.val();
+            container.innerHTML = "";
+
+            let found = false;
+            if (classesData) {
+              const filtered = Object.entries(classesData).filter(([id, c]) => {
+                const stat = c.status || "active";
+                return stat === status;
+              });
+              if (filtered.length) {
+                found = true;
+                filtered.sort(([, a], [, b]) =>
+                  (b.createdAt || "").localeCompare(a.createdAt || "")
+                );
+
+                const promises = filtered.map(([id, c]) =>
+                  db
+                    .ref(`classes/${id}/students`)
+                    .once("value")
+                    .then((snap) => ({
+                      classId: id,
+                      classData: c,
+                      studentCount: snap.exists()
+                        ? Object.keys(snap.val()).length
+                        : 0,
+                    }))
+                );
+
+                Promise.all(promises).then((results) => {
+                  results.forEach(({ classId, classData, studentCount }) => {
+                    container.innerHTML += createClassCard(
+                      classId,
+                      classData,
+                      studentCount
+                    );
+                  });
                 });
-            });
-        }
-
-        function loadClasses(status) {
-            const container = document.getElementById('classCardsContainer');
-            container.innerHTML =
-                '<p style="grid-column: 1 / -1; text-align: center; color: var(--light-text-color);">กำลังโหลดห้องเรียน...</p>';
-
-            const classesRef = db.ref('classes');
-            classesRef.on(
-                'value',
-                snapshot => {
-                    classesData = snapshot.val();
-                    container.innerHTML = '';
-
-                    let found = false;
-                    if (classesData) {
-                        const filtered = Object.entries(classesData).filter(([id, c]) => {
-                            const stat = c.status || 'active';
-                            return stat === status;
-                        });
-                        if (filtered.length) {
-                            found = true;
-                            filtered.sort(([, a], [, b]) => (b.createdAt || '').localeCompare(a.createdAt || ''));
-
-                            const promises = filtered.map(([id, c]) =>
-                                db.ref(`classes/${id}/students`).once('value').then(snap => ({
-                                    classId: id,
-                                    classData: c,
-                                    studentCount: snap.exists() ? Object.keys(snap.val()).length : 0,
-                                }))
-                            );
-
-                            Promise.all(promises).then(results => {
-                                results.forEach(({ classId, classData, studentCount }) => {
-                                    container.innerHTML += createClassCard(classId, classData, studentCount);
-                                });
-                            });
-                        }
-                    }
-                    if (!found) {
-                        container.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: var(--light-text-color);">ไม่พบห้องเรียนในสถานะ "${getThaiStatus(
-                            status
-                        )}".</p>`;
-                    }
-                },
-                error => {
-                    console.error('Error loading classes:', error);
-                    container.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: var(--danger-color);">เกิดข้อผิดพลาดในการโหลดห้องเรียน.</p>`;
-                }
-            );
-        }
-
-        function getThaiStatus(status) {
-            switch (status) {
-                case 'active':
-                    return 'ที่กำลังดำเนินการ';
-                case 'achieved':
-                    return 'ที่เรียนจบแล้ว';
-                case 'pending':
-                    return 'ที่รอการตรวจสอบ';
-                default:
-                    return status;
+              }
             }
+            if (!found) {
+              container.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: var(--light-text-color);">ไม่พบห้องเรียนในสถานะ "${getThaiStatus(
+                status
+              )}".</p>`;
+            }
+          },
+          (error) => {
+            console.error("Error loading classes:", error);
+            container.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: var(--danger-color);">เกิดข้อผิดพลาดในการโหลดห้องเรียน.</p>`;
+          }
+        );
+      }
+
+      function getThaiStatus(status) {
+        switch (status) {
+          case "active":
+            return "ที่กำลังดำเนินการ";
+          case "achieved":
+            return "ที่เรียนจบแล้ว";
+          case "pending":
+            return "ที่รอการตรวจสอบ";
+          default:
+            return status;
         }
+      }
 
-        function createClassCard(classId, classData, studentCount) {
-            const classDisplayName = classData.name || 'ชื่อวิชาไม่ระบุ';
-            const classLevel = classData.level ? ` (${classData.level})` : '';
-            const classDescription = classData.description
-                ? `<p style="font-size:0.85rem; color:var(--light-text-color); margin-top:4px; margin-bottom:8px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${classData.description}</p>`
-                : '';
-            const classBandId = classData.bandId || 'BANDID';
+      function createClassCard(classId, classData, studentCount) {
+        const classDisplayName = classData.name || "ชื่อวิชาไม่ระบุ";
+        const classLevel = classData.level ? ` (${classData.level})` : "";
+        const classDescription = classData.description
+          ? `<p style="font-size:0.85rem; color:var(--light-text-color); margin-top:4px; margin-bottom:8px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">${classData.description}</p>`
+          : "";
+        const classBandId = classData.bandId || "BANDID";
 
-            return `
+        return `
                 <div class="class-card">
                     <div class="card-header">
                         <div class="card-title-group">
@@ -547,120 +638,145 @@
                     <a href="summary.html?class=${classId}" class="enter-class-button">เข้าชั้นเรียน</a>
                 </div>
             `;
+      }
+
+      function openCreateClassModal() {
+        document.getElementById("createClassModal").style.display = "flex";
+        document.getElementById("modalClassId").value = "";
+        document.getElementById("modalClassName").value = "";
+        document.getElementById("modalClassLevel").value = "";
+        document.getElementById("modalClassDescription").value = "";
+        document.getElementById("modalClassBandId").value = "";
+        document.getElementById("modalClassStatus").value = "active";
+        document.getElementById("createEditModalTitle").textContent =
+          "สร้างห้องเรียนใหม่";
+        const btn = document.getElementById("createEditModalButton");
+        btn.textContent = "สร้าง";
+        btn.onclick = createClass;
+      }
+
+      function closeCreateClassModal() {
+        document.getElementById("createClassModal").style.display = "none";
+      }
+
+      function createClass() {
+        const className = document
+          .getElementById("modalClassName")
+          .value.trim();
+        const classLevel = document
+          .getElementById("modalClassLevel")
+          .value.trim();
+        const classDescription = document
+          .getElementById("modalClassDescription")
+          .value.trim();
+        const classBandId = document
+          .getElementById("modalClassBandId")
+          .value.trim();
+        const classStatus = document.getElementById("modalClassStatus").value;
+
+        if (!className || !classLevel) {
+          alert("กรุณากรอกชื่อวิชาและระดับชั้น");
+          return;
         }
 
-        function openCreateClassModal() {
-            document.getElementById('createClassModal').style.display = 'flex';
-            document.getElementById('modalClassId').value = '';
-            document.getElementById('modalClassName').value = '';
-            document.getElementById('modalClassLevel').value = '';
-            document.getElementById('modalClassDescription').value = '';
-            document.getElementById('modalClassBandId').value = '';
-            document.getElementById('modalClassStatus').value = 'active';
-            document.getElementById('createEditModalTitle').textContent = 'สร้างห้องเรียนใหม่';
-            const btn = document.getElementById('createEditModalButton');
-            btn.textContent = 'สร้าง';
-            btn.onclick = createClass;
-        }
+        const newClassRef = db.ref("classes").push();
+        newClassRef
+          .set({
+            name: className,
+            level: classLevel,
+            description: classDescription,
+            bandId:
+              classBandId ||
+              `B${newClassRef.key.substring(0, 5).toUpperCase()}`,
+            status: classStatus,
+            createdAt: new Date().toISOString(),
+          })
+          .then(() => {
+            alert("สร้างห้องเรียนสำเร็จ!");
+            closeCreateClassModal();
+          })
+          .catch((error) => {
+            console.error("Error creating class: ", error);
+            alert("เกิดข้อผิดพลาดในการสร้างห้องเรียน");
+          });
+      }
 
-        function closeCreateClassModal() {
-            document.getElementById('createClassModal').style.display = 'none';
-        }
-
-        function createClass() {
-            const className = document.getElementById('modalClassName').value.trim();
-            const classLevel = document.getElementById('modalClassLevel').value.trim();
-            const classDescription = document.getElementById('modalClassDescription').value.trim();
-            const classBandId = document.getElementById('modalClassBandId').value.trim();
-            const classStatus = document.getElementById('modalClassStatus').value;
-
-            if (!className || !classLevel) {
-                alert('กรุณากรอกชื่อวิชาและระดับชั้น');
-                return;
+      function editClass(classId) {
+        db.ref(`classes/${classId}`)
+          .once("value")
+          .then((snapshot) => {
+            const classData = snapshot.val();
+            if (!classData) {
+              alert("ไม่พบข้อมูลห้องเรียนที่ต้องการแก้ไข");
+              return;
             }
 
-            const newClassRef = db.ref('classes').push();
-            newClassRef
-                .set({
-                    name: className,
-                    level: classLevel,
-                    description: classDescription,
-                    bandId: classBandId || `B${newClassRef.key.substring(0, 5).toUpperCase()}`,
-                    status: classStatus,
-                    createdAt: new Date().toISOString(),
-                })
-                .then(() => {
-                    alert('สร้างห้องเรียนสำเร็จ!');
-                    closeCreateClassModal();
-                })
-                .catch(error => {
-                    console.error('Error creating class: ', error);
-                    alert('เกิดข้อผิดพลาดในการสร้างห้องเรียน');
-                });
+            document.getElementById("modalClassId").value = classId;
+            document.getElementById("modalClassName").value =
+              classData.name || "";
+            document.getElementById("modalClassLevel").value =
+              classData.level || "";
+            document.getElementById("modalClassDescription").value =
+              classData.description || "";
+            document.getElementById("modalClassBandId").value =
+              classData.bandId || "";
+            document.getElementById("modalClassStatus").value =
+              classData.status || "active";
+
+            document.getElementById("createEditModalTitle").textContent =
+              "แก้ไขห้องเรียน";
+            const btn = document.getElementById("createEditModalButton");
+            btn.textContent = "บันทึกการแก้ไข";
+            btn.onclick = saveEditedClass;
+
+            document.getElementById("createClassModal").style.display = "flex";
+          })
+          .catch((err) => {
+            console.error(err);
+            alert("เกิดข้อผิดพลาดในการโหลดข้อมูล");
+          });
+      }
+
+      function saveEditedClass() {
+        const classId = document.getElementById("modalClassId").value;
+        const updatedName = document
+          .getElementById("modalClassName")
+          .value.trim();
+        const updatedLevel = document
+          .getElementById("modalClassLevel")
+          .value.trim();
+        const updatedDescription = document
+          .getElementById("modalClassDescription")
+          .value.trim();
+        const updatedBandId = document
+          .getElementById("modalClassBandId")
+          .value.trim();
+        const updatedStatus = document.getElementById("modalClassStatus").value;
+
+        if (!updatedName || !updatedLevel) {
+          alert("กรุณากรอกชื่อวิชาและระดับชั้น");
+          return;
         }
 
-        function editClass(classId) {
-            db.ref(`classes/${classId}`)
-                .once('value')
-                .then(snapshot => {
-                    const classData = snapshot.val();
-                    if (!classData) {
-                        alert('ไม่พบข้อมูลห้องเรียนที่ต้องการแก้ไข');
-                        return;
-                    }
-
-                    document.getElementById('modalClassId').value = classId;
-                    document.getElementById('modalClassName').value = classData.name || '';
-                    document.getElementById('modalClassLevel').value = classData.level || '';
-                    document.getElementById('modalClassDescription').value = classData.description || '';
-                    document.getElementById('modalClassBandId').value = classData.bandId || '';
-                    document.getElementById('modalClassStatus').value = classData.status || 'active';
-
-                    document.getElementById('createEditModalTitle').textContent = 'แก้ไขห้องเรียน';
-                    const btn = document.getElementById('createEditModalButton');
-                    btn.textContent = 'บันทึกการแก้ไข';
-                    btn.onclick = saveEditedClass;
-
-                    document.getElementById('createClassModal').style.display = 'flex';
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert('เกิดข้อผิดพลาดในการโหลดข้อมูล');
-                });
-        }
-
-        function saveEditedClass() {
-            const classId = document.getElementById('modalClassId').value;
-            const updatedName = document.getElementById('modalClassName').value.trim();
-            const updatedLevel = document.getElementById('modalClassLevel').value.trim();
-            const updatedDescription = document.getElementById('modalClassDescription').value.trim();
-            const updatedBandId = document.getElementById('modalClassBandId').value.trim();
-            const updatedStatus = document.getElementById('modalClassStatus').value;
-
-            if (!updatedName || !updatedLevel) {
-                alert('กรุณากรอกชื่อวิชาและระดับชั้น');
-                return;
-            }
-
-            db.ref(`classes/${classId}`)
-                .update({
-                    name: updatedName,
-                    level: updatedLevel,
-                    description: updatedDescription,
-                    bandId: updatedBandId || classesData[classId]?.bandId || '',
-                    status: updatedStatus,
-                    updatedAt: new Date().toISOString(),
-                })
-                .then(() => {
-                    alert('บันทึกการแก้ไขห้องเรียนสำเร็จ!');
-                    closeCreateClassModal();
-                    loadClasses(currentClassStatus); // รีโหลดข้อมูลใหม่หลังแก้ไข
-                })
-                .catch(error => {
-                    console.error('Error saving edited class: ', error);
-                    alert('เกิดข้อผิดพลาดในการบันทึกการแก้ไข');
-                });
-        }
+        db.ref(`classes/${classId}`)
+          .update({
+            name: updatedName,
+            level: updatedLevel,
+            description: updatedDescription,
+            bandId: updatedBandId || classesData[classId]?.bandId || "",
+            status: updatedStatus,
+            updatedAt: new Date().toISOString(),
+          })
+          .then(() => {
+            alert("บันทึกการแก้ไขห้องเรียนสำเร็จ!");
+            closeCreateClassModal();
+            loadClasses(currentClassStatus); // รีโหลดข้อมูลใหม่หลังแก้ไข
+          })
+          .catch((error) => {
+            console.error("Error saving edited class: ", error);
+            alert("เกิดข้อผิดพลาดในการบันทึกการแก้ไข");
+          });
+      }
     </script>
-</body>
+  </body>
 </html>
