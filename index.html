@@ -12,411 +12,409 @@
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet"
     />
-  <style>
-    :root {
-    --primary-color: #4caf50;
-    --secondary-color: #2196f3;
-    --accent-color: #ffc107;
-    --text-color: #333;
-    --light-text-color: #666;
-    --background-color: #f0f2f5;
-    --card-background: #ffffff;
-    --border-color: #e0e0e0;
-    --hover-light: #e3f2fd;
-    --header-bg: #ffffff;
-    --nav-button-bg: #4caf50;
-    --nav-button-hover-bg: #43a047;
-    --tab-active-bg: #2196f3;
-    --tab-inactive-bg: #e0e0e0;
-    --tab-active-text: #fff;
-    --tab-inactive-text: #666;
-    --button-blue: #2196f3;
-    --button-blue-hover: #1976d2;
-    --danger-color: #f44336;
-}
+    <style>
+      :root {
+        --primary-color: #4caf50;
+        --secondary-color: #2196f3;
+        --accent-color: #ffc107;
+        --text-color: #333;
+        --light-text-color: #666;
+        --background-color: #f0f2f5;
+        --card-background: #ffffff;
+        --border-color: #e0e0e0;
+        --hover-light: #e3f2fd;
+        --header-bg: #ffffff;
+        --nav-button-bg: #4caf50;
+        --nav-button-hover-bg: #43a047;
+        --tab-active-bg: #2196f3;
+        --tab-inactive-bg: #e0e0e0;
+        --tab-active-text: #fff;
+        --tab-inactive-text: #666;
+        --button-blue: #2196f3;
+        --button-blue-hover: #1976d2;
+        --danger-color: #f44336;
+      }
 
-body {
-    font-family: 'Sarabun', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: var(--background-color);
-    color: var(--text-color);
-    line-height: 1.6;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-.header {
-    background-color: var(--header-bg);
-    padding: 15px 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
-}
-
-.header .logo-section {
-    display: flex;
-    align-items: center;
-}
-
-.header .logo-icon {
-    font-size: 2.5rem;
-    color: var(--primary-color);
-    margin-right: 10px;
-}
-
-.header .logo-text {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-color);
-}
-
-.header .create-class-button {
-    background-color: var(--nav-button-bg);
-    color: white;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1.1rem;
-    font-weight: 600;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-}
-
-.header .create-class-button:hover {
-    background-color: var(--nav-button-hover-bg);
-    transform: translateY(-2px);
-}
-
-.header .create-class-button .material-icons {
-    font-size: 1.4rem;
-}
-
-.tab-navigation {
-    background-color: var(--header-bg);
-    padding: 10px 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.tab-navigation .tab {
-    padding: 10px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
-    min-width: 120px;
-    text-align: center;
-    text-decoration: none;
-}
-
-.tab-navigation .tab.active {
-    background-color: var(--tab-active-bg);
-    color: var(--tab-active-text);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-.tab-navigation .tab:not(.active) {
-    background-color: var(--tab-inactive-bg);
-    color: var(--tab-inactive-text);
-}
-
-.tab-navigation .tab:not(.active):hover {
-    background-color: var(--hover-light);
-    color: var(--secondary-color);
-}
-
-.main-content {
-    flex-grow: 1;
-    padding: 20px;
-    max-width: 1300px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-}
-
-.class-card {
-    background-color: var(--card-background);
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    padding: 15px 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border: 1px solid var(--border-color);
-
-    /* บังคับให้เป็นจัตุรัส */
-    aspect-ratio: 1 / 1;
-    overflow: hidden; /* กรณีเนื้อหาล้นออกมา */
-}
-
-.class-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 10px;
-}
-
-.card-title-group {
-    flex-grow: 1;
-    overflow: hidden;
-}
-
-.class-name {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    margin-bottom: 3px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.class-id {
-    font-size: 0.85rem;
-    color: var(--light-text-color);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.card-icons {
-    display: flex;
-    gap: 10px;
-    margin-left: 15px;
-}
-
-.card-icons .material-icons {
-    font-size: 1.5rem;
-    color: var(--secondary-color);
-    cursor: pointer;
-    transition: color 0.2s ease;
-}
-
-.card-icons .material-icons:hover {
-    color: var(--primary-color);
-}
-
-.student-count {
-    font-size: 0.9rem;
-    color: var(--light-text-color);
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.student-count .material-icons {
-    font-size: 1.2rem;
-    color: var(--primary-color);
-}
-
-.enter-class-button {
-    background-color: var(--button-blue);
-    color: white;
-    padding: 10px 18px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    font-weight: 600;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    text-decoration: none;
-    text-align: center;
-    align-self: flex-start;
-    margin-top: auto;
-}
-
-.enter-class-button:hover {
-    background-color: var(--button-blue-hover);
-    transform: translateY(-1px);
-}
-
-.footer {
-    text-align: center;
-    padding: 20px;
-    margin-top: 30px;
-    color: var(--light-text-color);
-    font-size: 0.9rem;
-    border-top: 1px solid var(--border-color);
-}
-
-#createClassModal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.4);
-    justify-content: center;
-    align-items: center;
-    animation: fadeIn 0.3s ease-out;
-}
-
-#createClassModal > div {
-    background-color: #fefefe;
-    margin: auto;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    width: 90%;
-    max-width: 480px;
-    box-sizing: border-box;
-}
-
-#createClassModal h2 {
-    color: var(--secondary-color);
-    margin-top: 0;
-    margin-bottom: 20px;
-    text-align: center;
-    border-bottom: none;
-}
-
-#createClassModal label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: var(--text-color);
-}
-
-#createClassModal input[type="text"],
-#createClassModal textarea,
-#createClassModal select {
-    width: calc(100% - 24px);
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    font-size: 1rem;
-    box-sizing: border-box;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-#createClassModal input[type="text"]:focus,
-#createClassModal textarea:focus,
-#createClassModal select:focus {
-    border-color: var(--secondary-color);
-    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
-    outline: none;
-}
-
-#createClassModal textarea {
-    resize: vertical;
-}
-
-#createClassModal .button-group {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-#createClassModal .button-group button {
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-#createClassModal .button-group button:first-child {
-    background-color: var(--primary-color);
-    color: white;
-}
-
-#createClassModal .button-group button:first-child:hover {
-    background-color: var(--nav-button-hover-bg);
-}
-
-#createClassModal .button-group button:last-child {
-    background-color: #6c757d;
-    color: white;
-}
-
-#createClassModal .button-group button:last-child:hover {
-    background-color: #5a6268;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-@media (max-width: 768px) {
-    .header {
+      body {
+        font-family: 'Sarabun', sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        line-height: 1.6;
+        display: flex;
         flex-direction: column;
-        align-items: flex-start;
-        padding: 10px 15px;
-        gap: 10px;
-    }
-    .header .create-class-button {
-        width: 100%;
-        justify-content: center;
-        margin-top: 10px;
-        padding: 10px 15px;
-        font-size: 1rem;
-    }
-    .tab-navigation {
-        padding: 10px 15px;
-        flex-direction: column;
-        gap: 8px;
-    }
-    .tab-navigation .tab {
-        width: 100%;
-        min-width: unset;
-        padding: 10px 15px;
-    }
-    .main-content {
-        /* ที่หน้าจอเล็ก จะลดเหลือคอลัมน์เดียว เพื่อไม่ให้ overflow */
-        grid-template-columns: 1fr;
-        padding: 15px;
-    }
-    .class-card {
-        padding: 18px;
-    }
-    .class-name {
-        font-size: 1.2rem;
-    }
-    .class-id {
-        font-size: 0.85rem;
-    }
-    .card-icons .material-icons {
-        font-size: 1.6rem;
-    }
-    .enter-class-button {
-        padding: 10px 15px;
-    }
-    #createClassModal > div {
-        padding: 20px;
-    }
-    #createClassModal h2 {
+        min-height: 100vh;
+      }
+
+      .header {
+        background-color: var(--header-bg);
+        padding: 15px 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+
+      .header .logo-section {
+        display: flex;
+        align-items: center;
+      }
+
+      .header .logo-icon {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-right: 10px;
+      }
+
+      .header .logo-text {
         font-size: 1.5rem;
-    }
-}
+        font-weight: 700;
+        color: var(--text-color);
+      }
 
-  </style>
+      .header .create-class-button {
+        background-color: var(--nav-button-bg);
+        color: white;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1.1rem;
+        font-weight: 600;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+      }
+
+      .header .create-class-button:hover {
+        background-color: var(--nav-button-hover-bg);
+        transform: translateY(-2px);
+      }
+
+      .header .create-class-button .material-icons {
+        font-size: 1.4rem;
+      }
+
+      .tab-navigation {
+        background-color: var(--header-bg);
+        padding: 10px 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .tab-navigation .tab {
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        min-width: 120px;
+        text-align: center;
+        text-decoration: none;
+      }
+
+      .tab-navigation .tab.active {
+        background-color: var(--tab-active-bg);
+        color: var(--tab-active-text);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      }
+
+      .tab-navigation .tab:not(.active) {
+        background-color: var(--tab-inactive-bg);
+        color: var(--tab-inactive-text);
+      }
+
+      .tab-navigation .tab:not(.active):hover {
+        background-color: var(--hover-light);
+        color: var(--secondary-color);
+      }
+
+      .main-content {
+        flex-grow: 1;
+        padding: 20px;
+        max-width: 1300px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+
+      .class-card {
+        background-color: var(--card-background);
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        padding: 15px 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border: 1px solid var(--border-color);
+
+        /* บังคับให้เป็นจัตุรัส */
+        aspect-ratio: 1 / 1;
+        overflow: hidden;
+      }
+
+      .class-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 10px;
+      }
+
+      .card-title-group {
+        flex-grow: 1;
+        overflow: hidden;
+      }
+
+      .class-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .class-id {
+        font-size: 0.85rem;
+        color: var(--light-text-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .card-icons {
+        display: flex;
+        gap: 10px;
+        margin-left: 15px;
+      }
+
+      .card-icons .material-icons {
+        font-size: 1.5rem;
+        color: var(--secondary-color);
+        cursor: pointer;
+        transition: color 0.2s ease;
+      }
+
+      .card-icons .material-icons:hover {
+        color: var(--primary-color);
+      }
+
+      .student-count {
+        font-size: 0.9rem;
+        color: var(--light-text-color);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .student-count .material-icons {
+        font-size: 1.2rem;
+        color: var(--primary-color);
+      }
+
+      .enter-class-button {
+        background-color: var(--button-blue);
+        color: white;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.95rem;
+        font-weight: 600;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        text-decoration: none;
+        text-align: center;
+        align-self: flex-start;
+        margin-top: auto;
+      }
+
+      .enter-class-button:hover {
+        background-color: var(--button-blue-hover);
+        transform: translateY(-1px);
+      }
+
+      .footer {
+        text-align: center;
+        padding: 20px;
+        margin-top: 30px;
+        color: var(--light-text-color);
+        font-size: 0.9rem;
+        border-top: 1px solid var(--border-color);
+      }
+
+      #createClassModal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0; top: 0;
+        width: 100%; height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+        justify-content: center;
+        align-items: center;
+        animation: fadeIn 0.3s ease-out;
+      }
+
+      #createClassModal > div {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        width: 90%;
+        max-width: 480px;
+        box-sizing: border-box;
+      }
+
+      #createClassModal h2 {
+        color: var(--secondary-color);
+        margin-top: 0;
+        margin-bottom: 20px;
+        text-align: center;
+        border-bottom: none;
+      }
+
+      #createClassModal label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--text-color);
+      }
+
+      #createClassModal input[type="text"],
+      #createClassModal textarea,
+      #createClassModal select {
+        width: calc(100% - 24px);
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        font-size: 1rem;
+        box-sizing: border-box;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      #createClassModal input[type="text"]:focus,
+      #createClassModal textarea:focus,
+      #createClassModal select:focus {
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+        outline: none;
+      }
+
+      #createClassModal textarea {
+        resize: vertical;
+      }
+
+      #createClassModal .button-group {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      #createClassModal .button-group button {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+      }
+
+      #createClassModal .button-group button:first-child {
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      #createClassModal .button-group button:first-child:hover {
+        background-color: var(--nav-button-hover-bg);
+      }
+
+      #createClassModal .button-group button:last-child {
+        background-color: #6c757d;
+        color: white;
+      }
+
+      #createClassModal .button-group button:last-child:hover {
+        background-color: #5a6268;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+      }
+
+      @media (max-width: 768px) {
+        .header {
+          flex-direction: column;
+          align-items: flex-start;
+          padding: 10px 15px;
+          gap: 10px;
+        }
+        .header .create-class-button {
+          width: 100%;
+          justify-content: center;
+          margin-top: 10px;
+          padding: 10px 15px;
+          font-size: 1rem;
+        }
+        .tab-navigation {
+          padding: 10px 15px;
+          flex-direction: column;
+          gap: 8px;
+        }
+        .tab-navigation .tab {
+          width: 100%;
+          min-width: unset;
+          padding: 10px 15px;
+        }
+        .main-content {
+          grid-template-columns: 1fr;
+          padding: 15px;
+        }
+        .class-card {
+          padding: 18px;
+        }
+        .class-name {
+          font-size: 1.2rem;
+        }
+        .class-id {
+          font-size: 0.85rem;
+        }
+        .card-icons .material-icons {
+          font-size: 1.6rem;
+        }
+        .enter-class-button {
+          padding: 10px 15px;
+        }
+        #createClassModal > div {
+          padding: 20px;
+        }
+        #createClassModal h2 {
+          font-size: 1.5rem;
+        }
+      }
+    </style>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   </head>
@@ -515,7 +513,6 @@ body {
       const db = firebase.database();
 
       let currentClassStatus = "active";
-      let classesData = {};
 
       window.onload = () => {
         loadClasses(currentClassStatus);
@@ -542,10 +539,11 @@ body {
           '<p style="grid-column: 1 / -1; text-align: center; color: var(--light-text-color);">กำลังโหลดห้องเรียน...</p>';
 
         const classesRef = db.ref("classes");
-        classesRef.on(
-          "value",
-          (snapshot) => {
-            classesData = snapshot.val();
+
+        classesRef
+          .once("value")
+          .then((snapshot) => {
+            const classesData = snapshot.val();
             container.innerHTML = "";
 
             let found = false;
@@ -554,6 +552,7 @@ body {
                 const stat = c.status || "active";
                 return stat === status;
               });
+
               if (filtered.length) {
                 found = true;
                 filtered.sort(([, a], [, b]) =>
@@ -584,17 +583,17 @@ body {
                 });
               }
             }
+
             if (!found) {
               container.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: var(--light-text-color);">ไม่พบห้องเรียนในสถานะ "${getThaiStatus(
                 status
               )}".</p>`;
             }
-          },
-          (error) => {
+          })
+          .catch((error) => {
             console.error("Error loading classes:", error);
             container.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: var(--danger-color);">เกิดข้อผิดพลาดในการโหลดห้องเรียน.</p>`;
-          }
-        );
+          });
       }
 
       function getThaiStatus(status) {
@@ -619,25 +618,25 @@ body {
         const classBandId = classData.bandId || "BANDID";
 
         return `
-                <div class="class-card">
-                    <div class="card-header">
-                        <div class="card-title-group">
-                            <div class="class-name" title="${classDisplayName}">${classDisplayName}${classLevel}</div>
-                            <div class="class-id" title="${classBandId}">${classBandId}</div>
-                        </div>
-                        <div class="card-icons">
-                            <span class="material-icons" title="แก้ไขห้องเรียน" onclick="editClass('${classId}')">edit_note</span>
-                            <span class="material-icons" title="จัดการห้องเรียน" onclick="location.href='class_management.html?class=${classId}'">settings</span>
-                        </div>
-                    </div>
-                    ${classDescription}
-                    <div class="student-count">
-                        <span class="material-icons">people</span>
-                        ${studentCount} คน
-                    </div>
-                    <a href="summary.html?class=${classId}" class="enter-class-button">เข้าชั้นเรียน</a>
-                </div>
-            `;
+          <div class="class-card">
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="class-name" title="${classDisplayName}">${classDisplayName}${classLevel}</div>
+                <div class="class-id" title="${classBandId}">${classBandId}</div>
+              </div>
+              <div class="card-icons">
+                <span class="material-icons" title="แก้ไขห้องเรียน" onclick="editClass('${classId}')">edit_note</span>
+                <span class="material-icons" title="จัดการห้องเรียน" onclick="location.href='class_management.html?class=${classId}'">settings</span>
+              </div>
+            </div>
+            ${classDescription}
+            <div class="student-count">
+              <span class="material-icons">people</span>
+              ${studentCount} คน
+            </div>
+            <a href="summary.html?class=${classId}" class="enter-class-button">เข้าชั้นเรียน</a>
+          </div>
+        `;
       }
 
       function openCreateClassModal() {
@@ -694,6 +693,7 @@ body {
           .then(() => {
             alert("สร้างห้องเรียนสำเร็จ!");
             closeCreateClassModal();
+            loadClasses(currentClassStatus);
           })
           .catch((error) => {
             console.error("Error creating class: ", error);
@@ -763,14 +763,14 @@ body {
             name: updatedName,
             level: updatedLevel,
             description: updatedDescription,
-            bandId: updatedBandId || classesData[classId]?.bandId || "",
+            bandId: updatedBandId,
             status: updatedStatus,
             updatedAt: new Date().toISOString(),
           })
           .then(() => {
             alert("บันทึกการแก้ไขห้องเรียนสำเร็จ!");
             closeCreateClassModal();
-            loadClasses(currentClassStatus); // รีโหลดข้อมูลใหม่หลังแก้ไข
+            loadClasses(currentClassStatus);
           })
           .catch((error) => {
             console.error("Error saving edited class: ", error);
