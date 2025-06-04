@@ -9,6 +9,209 @@
   <link rel="stylesheet" href="classroom.css" />
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <style>
+    /* ===== CSS สำหรับ Modal จับเวลา ===== */
+    #timerModal {
+      display: none;
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    #timerModal .modal-content {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 20px;
+      width: 80%;
+      max-width: 600px;
+      max-height: 90%;
+      overflow-y: auto;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      position: relative;
+      font-family: "Prompt", sans-serif;
+    }
+    #timerModal .close-timer-btn {
+      position: absolute; top: 8px; right: 12px;
+      font-size: 24px; cursor: pointer;
+    }
+    #timerModal h2 {
+      margin-top: 0;
+      font-size: 20px;
+      text-align: center;
+    }
+    #timerModal .mode-switch {
+      display: flex; justify-content: center;
+      margin-bottom: 12px;
+    }
+    #timerModal .mode-switch button {
+      flex: 1; margin: 0 4px; padding: 8px 0;
+      border: none; background: var(--primary-color);
+      color: #fff; border-radius: 4px; cursor: pointer;
+      font-weight: 600; font-size: 14px;
+    }
+    #timerModal .mode-switch button.active {
+      background: var(--accent-color);
+    }
+    #countdownSection, #stopwatchSection {
+      display: none;
+    }
+    #countdownSection.active, #stopwatchSection.active {
+      display: block;
+    }
+    #countdownSection input[type="number"] {
+      width: 60px; padding: 4px; margin-right: 4px;
+      text-align: center; font-size: 16px;
+    }
+    #countdownDisplay, #stopwatchDisplay {
+      font-size: 36px; text-align: center;
+      margin: 16px 0; font-family: "Prompt", sans-serif;
+    }
+    #countdownControls button,
+    #stopwatchControls button {
+      flex: 1; margin: 4px; padding: 8px 0;
+      border: none; background: var(--secondary-color);
+      color: #fff; border-radius: 4px; cursor: pointer;
+      font-weight: 500; font-size: 14px;
+    }
+    #countdownControls, #stopwatchControls {
+      display: flex; justify-content: space-between;
+    }
+
+    /* ===== CSS สำหรับ Spinner Modal ===== */
+    #spinnerModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      align-items: center; justify-content: center;
+      z-index: 1100;
+    }
+    #spinnerModal .modal-content {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 20px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 90%;
+      overflow-y: auto;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+      position: relative;
+      font-family: "Prompt", sans-serif;
+      text-align: center;
+    }
+    #spinnerModal .close-spinner-btn {
+      position: absolute;
+      top: 8px; right: 12px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    #spinnerModal h2 {
+      margin-top: 0;
+      font-size: 24px;
+      color: var(--primary-color);
+    }
+    /* Canvas วงล้อ */
+    #wheelCanvas {
+      margin: 0 auto;
+      display: block;
+      background: #f9f9f9;
+      border: 4px solid var(--primary-color);
+      border-radius: 50%;
+    }
+    /* ปุ่มหมุน */
+    #spinnerModal button.spin-btn {
+      margin-top: 12px;
+      padding: 12px 24px;
+      background: var(--primary-color);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    /* แสดงชื่อที่ถูกสุ่ม */
+    #spinnerModal #selectedWheelName {
+      margin-top: 16px;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--accent-color);
+    }
+    /* ตารางรายชื่อนักเรียน (เล็ก ๆ) */
+    #spinnerModal table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    #spinnerModal th, #spinnerModal td {
+      border: 1px solid #ddd;
+      padding: 6px;
+      text-align: center;
+    }
+    #spinnerModal th {
+      background: var(--secondary-color);
+      color: #fff;
+      font-weight: 600;
+    }
+    #spinnerModal td.selected {
+      background: var(--accent-color);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* ===== CSS สำหรับ Congratulations Overlay ===== */
+    #congratsOverlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      align-items: center; justify-content: center;
+      z-index: 1200;
+    }
+    #congratsOverlay .congrats-box {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 30px 20px;
+      width: 80%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      font-family: "Prompt", sans-serif;
+      position: relative;
+      animation: popIn 0.3s ease-out;
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    #congratsOverlay .close-congrats-btn {
+      position: absolute;
+      top: 8px; right: 12px;
+      font-size: 22px;
+      cursor: pointer;
+      color: #666;
+    }
+    #congratsOverlay .congrats-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+    #congratsOverlay .congrats-text {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 12px;
+    }
+    #congratsOverlay .congrats-subtext {
+      font-size: 16px;
+      color: #333;
+    }
+  </style>
 </head>
 <body>
   <div class="sidebar" id="sidebar">
@@ -53,15 +256,16 @@
         </li>
       </ul>
     </nav>
-   
   </div>
 
   <div class="main-content">
     <div class="class-info-bar">
       <h1 id="classNameDisplay">กำลังโหลดชื่อห้องเรียน...</h1>
       <div class="class-subtitle" id="classCreationInfo"></div>
-      <div class="action-buttons ">
+      <div class="action-buttons">
         <button id="createStudentBtn">สร้างนักเรียน</button>
+        <button id="timerBtn" style="margin-left: 8px;">จับเวลา</button>
+        <button id="spinBtn" style="margin-left: 8px;">สุ่มชื่อ 🎡</button>
       </div>
     </div>
 
@@ -88,7 +292,7 @@
     </div>
   </div>
 
-  <!-- Modal รายละเอียดนักเรียน -->
+  <!-- Modal รายละเอียดนักเรียน (เหมือนเดิม) -->
   <div id="studentDetailModal">
     <div>
       <span class="close-btn" onclick="closeStudentDetailModal()">&times;</span>
@@ -130,7 +334,7 @@
     </div>
   </div>
 
-  <!-- Modal ตั้งค่าข้อมูลนักเรียน -->
+  <!-- Modal ตั้งค่าข้อมูลนักเรียน (เหมือนเดิม) -->
   <div id="studentSettingsModal">
     <div>
       <span class="close-settings-btn" onclick="closeStudentSettingsModal()">&times;</span>
@@ -151,13 +355,86 @@
     </div>
   </div>
 
+  <!-- Modal จับเวลา (Timer) -->
+  <div id="timerModal">
+    <div class="modal-content">
+      <span class="close-timer-btn" onclick="closeTimerModal()">&times;</span>
+      <h2>จับเวลา</h2>
+      <div class="mode-switch">
+        <button id="btnCountdownMode" class="active" onclick="switchMode('countdown')">นับถอยหลัง</button>
+        <button id="btnStopwatchMode" onclick="switchMode('stopwatch')">จับเวลา</button>
+      </div>
+      <div id="countdownSection" class="active">
+        <div style="text-align: center; margin-bottom: 8px;">
+          <label>กำหนดเวลา (นาที:วินาที)</label><br />
+          <input type="number" id="cdMinutes" min="0" value="0"> :
+          <input type="number" id="cdSeconds" min="0" max="59" value="30">
+        </div>
+        <div id="countdownDisplay">00:30</div>
+        <div id="countdownControls">
+          <button onclick="startCountdown()">เริ่ม</button>
+          <button onclick="pauseCountdown()">พัก</button>
+          <button onclick="resetCountdown()">รีเซ็ต</button>
+        </div>
+      </div>
+      <div id="stopwatchSection">
+        <div id="stopwatchDisplay">00:00:00</div>
+        <div id="stopwatchControls">
+          <button onclick="startStopwatch()">เริ่ม</button>
+          <button onclick="pauseStopwatch()">พัก</button>
+          <button onclick="resetStopwatch()">รีเซ็ต</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal วงล้อสุ่มชื่อ (Spinner) -->
+  <div id="spinnerModal">
+    <div class="modal-content">
+      <span class="close-spinner-btn" onclick="closeSpinnerModal()">&times;</span>
+      <h2>สุ่มชื่อนักเรียนด้วยวงล้อ</h2>
+
+      <!-- Canvas วาดวงล้อ -->
+      <canvas id="wheelCanvas" width="600" height="600"></canvas>
+
+      <!-- ปุ่มหมุนวงล้อ -->
+      <button class="spin-btn" onclick="spinWheel()">หมุนวงล้อ</button>
+
+      <!-- ข้อความแสดงชื่อที่ถูกสุ่ม -->
+      <div id="selectedWheelName">คลิก “หมุนวงล้อ” เพื่อสุ่มชื่อ</div>
+
+      <!-- ตารางรายชื่อนักเรียนเล็ก ๆ -->
+      <table id="namesTable">
+        <thead>
+          <tr>
+            <th>ลำดับ</th>
+            <th>ชื่อ – นามสกุล</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- JS เติมข้อมูล -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Overlay แสดงผล Congratulations แบบกราฟิก -->
+  <div id="congratsOverlay">
+    <div class="congrats-box">
+      <span class="close-congrats-btn" onclick="closeCongrats()">&times;</span>
+      <div class="congrats-icon">🎉</div>
+      <div class="congrats-text" id="congratsText">ยินดีด้วย!</div>
+      <div class="congrats-subtext" id="congratsSubtext">คุณได้ถูกสุ่มชื่อ</div>
+    </div>
+  </div>
+
   <script>
+    // ====== ฟังก์ชัน Sidebar ======
     function toggleSidebar() {
       document.getElementById('sidebar').classList.toggle('collapsed');
     }
-  </script>
 
-  <script>
+    // ====== เริ่ม Firebase ======
     const firebaseConfig = {
       apiKey: "AIzaSyCTyiR22AHeiKzI7Yr0g-V_dmdVPeh4ybo",
       authDomain: "kru-digital.firebaseapp.com",
@@ -174,17 +451,30 @@
     let currentClassId = "";
     let studentsData = {};
     let scoresData = {};
-
+    let sortedNamesArray = []; // เก็บลำดับรายชื่อนักเรียนเรียงตามเลขที่
     const defaultSpecialScoreTypes = [
       { emoji: "👏", label: "well done!", scoreValue: 1, typeId: "wellDone" },
       { emoji: "👍", label: "good job!", scoreValue: 1, typeId: "goodJob" },
       { emoji: "⭐", label: "fantastic", scoreValue: 1, typeId: "fantastic" },
     ];
 
+    // ***** สำหรับการหมุนวงล้อ *****
+    let wheelCanvas, wheelCtx;
+    let wheelRadius;
+    let isSpinning = false;
+    let spinAngle = 0;         // มุมปัจจุบัน (radians)
+    let angularVelocity = 0;   // ความเร็วเชิงมุม (radians/frame)
+    const friction = 0.995;    // ค่าลดความเร็วต่อ frame (0 < friction < 1)
+
     window.onload = () => {
+      // ปุ่มจับเวลา
+      document.getElementById("timerBtn").onclick = openTimerModal;
+      // ปุ่มหมุนวงล้อ
+      document.getElementById("spinBtn").onclick = openSpinnerModal;
+
+      // โหลดข้อมูลห้องเรียนจาก URL
       const urlParams = new URLSearchParams(window.location.search);
       currentClassId = urlParams.get("class");
-
       if (!currentClassId) {
         document.getElementById("classNameDisplay").textContent = "ไม่พบข้อมูลชั้นเรียน";
         document.getElementById("classCreationInfo").textContent =
@@ -193,7 +483,6 @@
           '<p style="grid-column:1/-1;text-align:center;color:#999;">ไม่พบข้อมูลห้องเรียน</p>';
         return;
       }
-
       document.getElementById("assignmentsLink").href = `assignments.html?class=${currentClassId}`;
       document.getElementById("attendanceLink").href = `attendance.html?class=${currentClassId}`;
       document.getElementById("summaryLink").href = `summary.html?class=${currentClassId}`;
@@ -201,6 +490,7 @@
         location.href = `create_student.html?class=${currentClassId}`;
       };
 
+      // ดึงข้อมูลห้องเรียน
       db.ref(`classes/${currentClassId}`).on(
         "value",
         (snapshot) => {
@@ -208,9 +498,7 @@
           if (classInfo) {
             const createdAt = classInfo.createdAt
               ? new Date(classInfo.createdAt).toLocaleDateString("th-TH", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
+                  year: "numeric", month: "long", day: "numeric",
                 })
               : "ไม่ระบุ";
             document.getElementById(
@@ -233,6 +521,7 @@
         }
       );
 
+      // ดึงข้อมูลนักเรียนและคะแนน
       db.ref(`classes/${currentClassId}/students`).on(
         "value",
         (studentsSnap) => {
@@ -243,6 +532,8 @@
               scoresData = scoresSnap.val() || {};
               renderStudentCards();
               updateSummaryStats();
+              buildNamesArray();    // เตรียมรายชื่อสำหรับสุ่มวงล้อ
+              drawWheel();          // วาดวงล้อครั้งแรก (ถ้ามีชื่อ)
             },
             (error) => {
               console.error("Error loading scores:", error);
@@ -261,26 +552,29 @@
             '<p style="grid-column:1/-1;text-align:center;color:#f44336;">เกิดข้อผิดพลาดในการโหลดรายชื่อนักเรียน</p>';
         }
       );
+
+      // เตรียม canvas สำหรับวงล้อ
+      wheelCanvas = document.getElementById("wheelCanvas");
+      wheelCtx = wheelCanvas.getContext("2d");
+      wheelRadius = wheelCanvas.width / 2;
     };
 
+    /* ====== ฟังก์ชันจัดการ Student Cards และ Summary ====== */
     function renderStudentCards() {
       const container = document.getElementById("studentCardsContainer");
       container.innerHTML = "";
       const studentIds = Object.keys(studentsData);
-
       if (studentIds.length === 0) {
         container.innerHTML =
           '<p style="grid-column:1/-1;text-align:center;color:var(--light-text-color);">ยังไม่มีนักเรียนในห้องเรียนนี้</p>';
         return;
       }
-
       studentIds.sort((a, b) => {
         const aNo = parseInt(studentsData[a].studentNo);
         const bNo = parseInt(studentsData[b].studentNo);
         if (!isNaN(aNo) && !isNaN(bNo)) return aNo - bNo;
         return (studentsData[a].firstName || "").localeCompare(studentsData[b].firstName || "");
       });
-
       studentIds.forEach((id, i) => {
         const student = studentsData[id];
         const score = scoresData[id] || { totalScore: 0, specialScore: 0 };
@@ -454,6 +748,284 @@
         console.error("Error saving student settings:", error);
         alert("เกิดข้อผิดพลาดในการบันทึกข้อมูลนักเรียน");
       }
+    }
+
+    /* ====== ฟังก์ชันสำหรับ Timer Modal ====== */
+    let countdownInterval = null;
+    let remainingTime = 0;
+    let stopwatchInterval = null;
+    let elapsedSeconds = 0;
+
+    function openTimerModal() {
+      document.getElementById("timerModal").style.display = "flex";
+      switchMode('countdown');
+      updateCountdownDisplay();
+      updateStopwatchDisplay();
+    }
+
+    function closeTimerModal() {
+      pauseCountdown();
+      pauseStopwatch();
+      document.getElementById("timerModal").style.display = "none";
+    }
+
+    function switchMode(mode) {
+      const cdBtn = document.getElementById("btnCountdownMode");
+      const swBtn = document.getElementById("btnStopwatchMode");
+      const cdSec = document.getElementById("countdownSection");
+      const swSec = document.getElementById("stopwatchSection");
+      if (mode === 'countdown') {
+        cdBtn.classList.add('active');
+        swBtn.classList.remove('active');
+        cdSec.classList.add('active');
+        swSec.classList.remove('active');
+      } else {
+        swBtn.classList.add('active');
+        cdBtn.classList.remove('active');
+        swSec.classList.add('active');
+        cdSec.classList.remove('active');
+      }
+    }
+
+    function updateCountdownDisplay() {
+      const min = parseInt(document.getElementById("cdMinutes").value) || 0;
+      const sec = parseInt(document.getElementById("cdSeconds").value) || 0;
+      remainingTime = min * 60 + sec;
+      const mm = String(Math.floor(remainingTime / 60)).padStart(2, '0');
+      const ss = String(remainingTime % 60).padStart(2, '0');
+      document.getElementById("countdownDisplay").textContent = `${mm}:${ss}`;
+    }
+
+    function startCountdown() {
+      if (countdownInterval) return;
+      if (remainingTime <= 0) {
+        alert("กรุณากำหนดเวลาให้ถูกต้อง");
+        return;
+      }
+      countdownInterval = setInterval(() => {
+        remainingTime--;
+        if (remainingTime < 0) remainingTime = 0;
+        const mm = String(Math.floor(remainingTime / 60)).padStart(2, '0');
+        const ss = String(remainingTime % 60).padStart(2, '0');
+        document.getElementById("countdownDisplay").textContent = `${mm}:${ss}`;
+        if (remainingTime === 0) {
+          clearInterval(countdownInterval);
+          countdownInterval = null;
+          alert("นับถอยหลังเสร็จสิ้น!");
+        }
+      }, 1000);
+    }
+
+    function pauseCountdown() {
+      if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+      }
+    }
+
+    function resetCountdown() {
+      pauseCountdown();
+      updateCountdownDisplay();
+    }
+
+    document.getElementById("cdMinutes").addEventListener("input", updateCountdownDisplay);
+    document.getElementById("cdSeconds").addEventListener("input", updateCountdownDisplay);
+
+    function updateStopwatchDisplay() {
+      const hrs = String(Math.floor(elapsedSeconds / 3600)).padStart(2, '0');
+      const mins = String(Math.floor((elapsedSeconds % 3600) / 60)).padStart(2, '0');
+      const secs = String(elapsedSeconds % 60).padStart(2, '0');
+      document.getElementById("stopwatchDisplay").textContent = `${hrs}:${mins}:${secs}`;
+    }
+
+    function startStopwatch() {
+      if (stopwatchInterval) return;
+      stopwatchInterval = setInterval(() => {
+        elapsedSeconds++;
+        updateStopwatchDisplay();
+      }, 1000);
+    }
+
+    function pauseStopwatch() {
+      if (stopwatchInterval) {
+        clearInterval(stopwatchInterval);
+        stopwatchInterval = null;
+      }
+    }
+
+    function resetStopwatch() {
+      pauseStopwatch();
+      elapsedSeconds = 0;
+      updateStopwatchDisplay();
+    }
+
+    /* ====== ฟังก์ชันสำหรับ Spinner วงล้อสุ่ม ====== */
+    function buildNamesArray() {
+      // สร้าง array ของชื่อนักเรียนเรียงตาม studentNo
+      const studentIds = Object.keys(studentsData);
+      studentIds.sort((a, b) => {
+        const aNo = parseInt(studentsData[a].studentNo);
+        const bNo = parseInt(studentsData[b].studentNo);
+        if (!isNaN(aNo) && !isNaN(bNo)) return aNo - bNo;
+        return (studentsData[a].firstName || "").localeCompare(studentsData[b].firstName || "");
+      });
+
+      sortedNamesArray = studentIds.map((id, idx) => {
+        const stu = studentsData[id];
+        const no = Number(stu.studentNo) || (idx + 1);
+        const formattedNo = String(no).padStart(2, '0');
+        return { id, label: `${formattedNo} – ${stu.firstName} ${stu.lastName}` };
+      });
+
+      // เติมรายชื่อเล็ก ๆ ในตารางใต้วงล้อ (เพื่อดูลำดับ)
+      const tbody = document.querySelector("#namesTable tbody");
+      tbody.innerHTML = "";
+      sortedNamesArray.forEach((stuObj, idx) => {
+        const row = document.createElement("tr");
+        row.id = `row-${idx + 1}`;
+        row.innerHTML = `
+          <td>${String(idx + 1).padStart(2, '0')}</td>
+          <td>${stuObj.label}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function openSpinnerModal() {
+      if (sortedNamesArray.length === 0) {
+        alert("ยังไม่มีรายชื่อนักเรียนให้สุ่ม");
+        return;
+      }
+      if (sortedNamesArray.length > 36) {
+        alert("ขณะนี้ระบบรองรับการสุ่มชื่อได้สูงสุด 36 คนเท่านั้น");
+        return;
+      }
+      document.getElementById("spinnerModal").style.display = "flex";
+      drawWheel();  // วาดวงล้อใหม่
+      document.getElementById("selectedWheelName").textContent = "คลิก “หมุนวงล้อ” เพื่อสุ่มชื่อ";
+      clearPreviousSelection();
+    }
+
+    function closeSpinnerModal() {
+      document.getElementById("spinnerModal").style.display = "none";
+      clearPreviousSelection();
+    }
+
+    function clearPreviousSelection() {
+      sortedNamesArray.forEach((_, idx) => {
+        const row = document.getElementById(`row-${idx + 1}`);
+        if (row) row.classList.remove("selected");
+      });
+    }
+
+    function drawWheel() {
+      const ctx = wheelCtx;
+      const n = sortedNamesArray.length;
+      const cx = wheelCanvas.width / 2;
+      const cy = wheelCanvas.height / 2;
+      const radius = wheelRadius - 4; // เผื่อ border
+      ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+
+      const segmentAngle = (2 * Math.PI) / n;
+      for (let i = 0; i < n; i++) {
+        const startAngle = i * segmentAngle + spinAngle;
+        const endAngle = startAngle + segmentAngle;
+        // สี HSL ให้แตกต่างกัน
+        const hue = Math.round((i * 360) / n);
+        ctx.fillStyle = `hsl(${hue}, 70%, 60%)`;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, radius, startAngle, endAngle);
+        ctx.lineTo(cx, cy);
+        ctx.fill();
+        // เขียนข้อความชื่อ
+        ctx.save();
+        ctx.translate(cx, cy);
+        const textAngle = startAngle + segmentAngle / 2;
+        ctx.rotate(textAngle);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#333";
+        ctx.font = "bold 14px Prompt";
+        ctx.fillText(sortedNamesArray[i].label, radius - 10, 5);
+        ctx.restore();
+      }
+      // วาดศูนย์กลาง
+      ctx.beginPath();
+      ctx.fillStyle = "#ffffff";
+      ctx.arc(cx, cy, 30, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "var(--primary-color)";
+      ctx.stroke();
+      // วาดลูกศรชี้บน
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - radius - 10);
+      ctx.lineTo(cx - 15, cy - radius + 20);
+      ctx.lineTo(cx + 15, cy - radius + 20);
+      ctx.closePath();
+      ctx.fillStyle = "var(--danger-color)";
+      ctx.fill();
+    }
+
+    function spinWheel() {
+      if (isSpinning) return;
+      isSpinning = true;
+      angularVelocity = (Math.random() * 0.1 + 0.3); // ความเร็วเริ่มต้น (radians/frame)
+      requestAnimationFrame(animateSpin);
+    }
+
+    function animateSpin() {
+      if (!isSpinning) return;
+      // ลดความเร็วเรื่อย ๆ
+      angularVelocity *= friction;
+      spinAngle += angularVelocity;
+      drawWheel();
+
+      // เมื่อลดลงต่ำกว่าค่า threshold ให้หยุด
+      if (angularVelocity > 0.002) {
+        requestAnimationFrame(animateSpin);
+      } else {
+        // หยุดหมุน
+        isSpinning = false;
+        angularVelocity = 0;
+        // คำนวณผลลัพธ์
+        const n = sortedNamesArray.length;
+        const segmentAngle = (2 * Math.PI) / n;
+        // normalize มุมให้อยู่ 0..2π
+        let normalizedAngle = spinAngle % (2 * Math.PI);
+        if (normalizedAngle < 0) normalizedAngle += 2 * Math.PI;
+        // pointerAngle = 3π/2 (12 นาฬิกา)
+        const pointerAngle = (3 * Math.PI / 2);
+        let index = Math.floor(((pointerAngle - normalizedAngle + 2 * Math.PI) % (2 * Math.PI)) / segmentAngle);
+        index = index % n;
+
+        // เน้นชื่อในตาราง
+        clearPreviousSelection();
+        const selectedRow = document.getElementById(`row-${index + 1}`);
+        if (selectedRow) selectedRow.classList.add("selected");
+        // แสดงชื่อใต้วงล้อ
+        const selectedLabel = sortedNamesArray[index].label;
+        document.getElementById("selectedWheelName").textContent = `ผลลัพธ์: ${selectedLabel}`;
+        // แสดง Congratulations Overlay แบบกราฟิก
+        showCongratsGraphic(selectedLabel);
+      }
+    }
+
+    /* ====== ฟังก์ชัน Congratulations Overlay ====== */
+    function showCongratsGraphic(label) {
+      const congratsTextEl = document.getElementById("congratsText");
+      const congratsSubtextEl = document.getElementById("congratsSubtext");
+      congratsTextEl.textContent = `ยินดีด้วย!`;
+      congratsSubtextEl.textContent = label;
+      document.getElementById("congratsOverlay").style.display = "flex";
+    }
+    function closeCongrats() {
+      document.getElementById("congratsOverlay").style.display = "none";
+    }
+
+    /* ====== ฟังก์ชันสุ่มเลขช่วย ====== */
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
     }
   </script>
 </body>
