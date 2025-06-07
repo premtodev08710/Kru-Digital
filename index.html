@@ -79,6 +79,61 @@
         color: var(--text-color);
       }
 
+      /* ====== เริ่มเพิ่มสไตล์ของ Toggle Switch ====== */
+      .drag-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+        color: var(--light-text-color);
+      }
+      .drag-toggle-label {
+        font-weight: 600;
+        color: var(--text-color);
+      }
+      /* Switch container */
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      /* Slider */
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.4s;
+        border-radius: 24px;
+      }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+      input:checked + .slider {
+        background-color: var(--button-blue);
+      }
+      input:checked + .slider:before {
+        transform: translateX(26px);
+      }
+      /* ====== จบส่วน Toggle Switch ====== */
+
       .header .create-class-button {
         background-color: var(--nav-button-bg);
         color: white;
@@ -99,10 +154,6 @@
       .header .create-class-button:hover {
         background-color: var(--nav-button-hover-bg);
         transform: translateY(-2px);
-      }
-
-      .header .create-class-button .material-icons {
-        font-size: 1.4rem;
       }
 
       .tab-navigation {
@@ -392,6 +443,10 @@
           padding: 10px 15px;
           font-size: 1rem;
         }
+        .drag-toggle {
+          width: 100%;
+          justify-content: space-between;
+        }
         .tab-navigation {
           padding: 10px 15px;
           flex-direction: column;
@@ -440,6 +495,17 @@
         <span class="material-icons logo-icon">menu_book</span>
         <span class="logo-text">ระบบจัดการชั้นเรียน</span>
       </div>
+
+      <!-- ====== เริ่มเพิ่ม Toggle Switch ====== -->
+      <div class="drag-toggle">
+        <span class="drag-toggle-label">จัดเรียงบอร์ด</span>
+        <label class="switch">
+          <input type="checkbox" id="toggleDrag" checked />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <!-- ====== จบ Toggle Switch ====== -->
+
       <a href="#" class="create-class-button" onclick="openCreateClassModal()">
         <span class="material-icons">add_circle</span>
         สร้างห้องเรียน
@@ -531,9 +597,27 @@
       // เก็บสถานะปัจจุบันของ tab ที่เลือก (active/achieved/pending)
       let currentClassStatus = "active";
 
+      // เก็บ instance ของ Sortable ไว้ใช้ enable/disable ทีหลัง
+      let sortableInstance = null;
+
       window.onload = () => {
+        // โหลดห้องเรียนตามสถานะที่เลือก
         loadClasses(currentClassStatus);
         setupTabListeners();
+
+        // ฟังชันการเปลี่ยนสถานะสวิตช์ จัดเรียง
+        document
+          .getElementById("toggleDrag")
+          .addEventListener("change", (e) => {
+            if (sortableInstance) {
+              // หากเช็คแล้ว ให้เปิด–ปิด drag ตามค่า checked
+              if (e.target.checked) {
+                sortableInstance.option("disabled", false);
+              } else {
+                sortableInstance.option("disabled", true);
+              }
+            }
+          });
       };
 
       // ตั้ง listener ให้แต่ละ tab
@@ -613,6 +697,13 @@
                 );
 
                 Promise.all(promises).then((results) => {
+                  // เคลียร์ sortableInstance เก่า (ถ้ามี) ก่อนสร้างใหม่ทุกครั้ง
+                  if (sortableInstance) {
+                    // ทำการลบ event เดิม แล้วสร้างใหม่ตาม context ใหม่
+                    sortableInstance.destroy();
+                    sortableInstance = null;
+                  }
+
                   // สร้าง HTML แต่ละ card แล้ว append เข้า container
                   results.forEach(({ classId, classData, studentCount }) => {
                     container.innerHTML += createClassCard(
@@ -622,7 +713,7 @@
                     );
                   });
 
-                  // หลัง append เสร็จ ค่อย init Sortable
+                  // หลัง append เสร็จ ค่อย init Sortable (แต่ให้เช็คว่าสวิตช์เปิดหรือปิด)
                   initDragAndDrop();
                 });
               }
@@ -849,9 +940,19 @@
 
       // ฟังก์ชันเริ่มต้น Sortable (ลากสลับลำดับได้)
       function initDragAndDrop() {
+        // สร้าง sortable เฉพาะเมื่อยังไม่มี instance เก่าอยู่
         const container = document.getElementById("classCardsContainer");
-        Sortable.create(container, {
+
+        // ตรวจสอบว่าสวิตช์เปิดอยู่หรือไม่ (ถ้าเปิด ให้สร้าง sortable ถ้าปิด ไม่ต้องสร้าง)
+        const isEnabled = document.getElementById("toggleDrag").checked;
+        if (!isEnabled) {
+          return;
+        }
+
+        // สร้าง sortable ใหม่
+        sortableInstance = Sortable.create(container, {
           animation: 150,
+          disabled: !isEnabled, // ถ้าเปิด สร้างด้วย disabled=false
           onEnd: (evt) => {
             // เมื่อเลื่อนเสร็จ ให้อัปเดต field 'order' ใน Firebase
             const cards = Array.from(
