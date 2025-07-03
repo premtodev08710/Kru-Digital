@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ส่งงาน - ระบบจัดการชั้นเรียน</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <style>
+    :root {
+      --primary-color: #4caf50;
+      --secondary-color: #2196f3;
+      --text-color: #333;
+      --background-color: #f0f2f5;
+      --border-color: #e0e0e0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Prompt', sans-serif;
+      background: var(--background-color);
+      color: var(--text-color);
+    }
+    .header {
+      background: #fff;
+      padding: 10px 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+    }
+    .logo-section { display: flex; align-items: center; }
+    .logo-icon { font-size: 2rem; color: var(--primary-color); margin-right: 8px; }
+    .logo-text { font-size: 1.2rem; font-weight: 600; }
+    .main-content {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+      gap: 20px;
+    }
+    .class-card {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .class-name { font-weight: 600; color: var(--primary-color); margin-bottom: 4px; }
+    .class-level { font-size: 0.9rem; color: #666; margin-bottom: 8px; }
+    .enter-class-btn {
+      background: var(--secondary-color);
+      color: #fff;
+      border: none;
+      padding: 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    /* Submission Section */
+    #submissionContainer {
+      display: none;
+      padding: 20px;
+      max-width: 600px;
+      margin: 20px auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    #submissionContainer h2 { margin-top: 0; }
+    .assignment-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .assignment-btn {
+      flex: 1 1 calc(50% - 10px);
+      background: var(--primary-color);
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+      text-align: center;
+    }
+    /* Modal */
+    #submissionModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    #submissionModal .modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+    }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; }
+    select, input[type=file], textarea, button {
+      width: 100%; padding: 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+    }
+    button { background: var(--primary-color); color: #fff; border: none; cursor: pointer; }
+    .close-btn { background: #666; margin-top: 10px; }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+  <header class="header">
+    <div class="logo-section">
+      <span class="material-icons logo-icon">menu_book</span>
+      <span class="logo-text">ระบบจัดการชั้นเรียน</span>
+    </div>
+  </header>
+  <main class="main-content" id="classCardsContainer">
+    <p style="grid-column:1/-1; text-align:center; color:#666;">กำลังโหลดห้องเรียน...</p>
+  </main>
+
+  <section id="submissionContainer">
+    <h2>ส่งงาน: <span id="selectedClassName"></span></h2>
+    <div class="assignment-buttons" id="assignmentButtons"></div>
+  </section>
+
+  <div id="submissionModal">
+    <div class="modal-content">
+      <h3 id="modalAssignmentName"></h3>
+      <div class="form-group">
+        <label for="studentSelect">ชื่อนักเรียน:</label>
+        <select id="studentSelect"><option value="">-- เลือกนักเรียน --</option></select>
+      </div>
+      <div class="form-group">
+        <label for="fileInput">ไฟล์งาน:</label>
+        <input type="file" id="fileInput" />
+      </div>
+      <div class="form-group">
+        <label for="commentInput">ความคิดเห็น (ไม่บังคับ):</label>
+        <textarea id="commentInput" rows="3"></textarea>
+      </div>
+      <button id="submitBtn">ส่งงาน</button>
+      <button class="close-btn" onclick="closeModal()">ยกเลิก</button>
+    </div>
+  </div>
+
+  <script>
+    // Firebase init
+    const firebaseConfig = { apiKey:"AIzaSy...", authDomain:"kru-digital.firebaseapp.com", projectId:"kru-digital", storageBucket:"kru-digital.firebasestorage.app", messagingSenderId:"464969597852", appId:"1:464969597852:web:..." };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let selectedClassId = '';
+    let currentAssignmentId = '';
+
+    // Load classes
+    db.ref('classes').once('value').then(snap => {
+      const data = snap.val()||{};
+      const container = document.getElementById('classCardsContainer');
+      container.innerHTML = '';
+      Object.entries(data).forEach(([cid, c]) => {
+        const card = document.createElement('div'); card.className = 'class-card';
+        card.innerHTML = `
+          <div>
+            <div class="class-name">${c.name||cid}</div>
+            <div class="class-level">${c.level||''}</div>
+          </div>
+          <button class="enter-class-btn" data-id="${cid}">เลือกห้องเรียน</button>
+        `;
+        container.appendChild(card);
+      });
+      document.querySelectorAll('.enter-class-btn').forEach(btn => btn.addEventListener('click', selectClass));
+    });
+
+    function selectClass(e) {
+      selectedClassId = e.target.dataset.id;
+      const name = e.target.parentElement.querySelector('.class-name').textContent;
+      document.getElementById('selectedClassName').textContent = name;
+      document.getElementById('classCardsContainer').style.display = 'none';
+      document.getElementById('submissionContainer').style.display = 'block';
+      loadAssignments();
+    }
+
+    function loadAssignments() {
+      const btnContainer = document.getElementById('assignmentButtons');
+      btnContainer.innerHTML = '';
+      db.ref(`classes/${selectedClassId}/assignments`).once('value').then(snap => {
+        const assigns = snap.val()||{};
+        Object.entries(assigns).forEach(([aid, ad]) => {
+          const btn = document.createElement('button');
+          btn.className = 'assignment-btn';
+          btn.textContent = ad.name;
+          btn.dataset.id = aid;
+          btn.dataset.name = ad.name;
+          btn.addEventListener('click', openModal);
+          btnContainer.appendChild(btn);
+        });
+      });
+    }
+
+    function openModal(e) {
+      currentAssignmentId = e.target.dataset.id;
+      document.getElementById('modalAssignmentName').textContent = e.target.dataset.name;
+      // load students
+      const select = document.getElementById('studentSelect'); select.innerHTML = '<option value="">-- เลือกนักเรียน --</option>';
+      db.ref(`classes/${selectedClassId}/students`).once('value').then(snap => {
+        const students = snap.val()||{};
+        Object.entries(students).forEach(([sid, sd]) => {
+          const o = document.createElement('option'); o.value = sid; o.textContent = `${sd.firstName} ${sd.lastName}`;
+          select.appendChild(o);
+        });
+      });
+      document.getElementById('submissionModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('submissionModal').style.display = 'none';
+    }
+
+    document.getElementById('submitBtn').addEventListener('click', () => {
+      // TODO: upload logic
+      alert('ส่งงาน: ' + currentAssignmentId);
+      closeModal();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>มอบหมายงาน - ระบบส่งงานนักเรียน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="classroom.css">
+    <style>
+      /* Modal Styles */
+      .modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; }
+      .modal { background:#fff; padding:1.5rem; border-radius:0.5rem; width:90%; max-width:400px; }
+      .modal h3 { margin-top:0; }
+      .modal .form-group { margin-bottom:1rem; }
+      .modal .btn { padding:0.5rem 1rem; border:none; border-radius:0.25rem; cursor:pointer; }
+      .btn-cancel { background:#ccc; margin-right:0.5rem; }
+      .btn-send { background:var(--primary-color); color:#fff; }
+    </style>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <button class="sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="สลับแถบข้าง">
+            <span class="material-icons">menu</span>
+        </button>
+        <div class="logo-section">
+            <span class="material-icons logo-icon">assignment</span>
+            <span class="logo-text">งานที่มอบหมาย</span>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header class="page-header">
+            <h1>งานที่มอบหมายทั้งหมด</h1>
+        </header>
+        <section class="assignment-list-section">
+            <ul id="assignmentList">
+                <li>กำลังโหลดงานที่มอบหมาย...</li>
+            </ul>
+        </section>
+    </div>
+
+    <!-- Submission Modal -->
+    <div class="modal-overlay" id="submissionModal">
+      <div class="modal">
+        <h3>ส่งงาน</h3>
+        <div class="form-group">
+          <label for="driveLinkInput">ลิงก์ Google Drive</label>
+          <input type="url" id="driveLinkInput" placeholder="https://drive.google.com/..." style="width:100%;padding:0.5rem;" required>
+        </div>
+        <div class="form-group">
+          <label for="commentInput">ความคิดเห็น (ถ้ามี)</label>
+          <textarea id="commentInput" rows="3" style="width:100%;padding:0.5rem;"></textarea>
+        </div>
+        <div style="text-align:right;">
+          <button class="btn btn-cancel" onclick="hideModal()">ยกเลิก</button>
+          <button class="btn btn-send" onclick="submitAssignment()">ส่งงาน</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        }
+        const firebaseConfig = {
+            apiKey: "AIzaSyCTyiR22AHeiKzI7Yr0g-V_dmdVPeh4ybo",
+            authDomain: "kru-digital.firebaseapp.com",
+            projectId: "kru-digital",
+            storageBucket: "kru-digital.firebasestorage.app",
+            messagingSenderId: "464969597852",
+            appId: "1:464969597852:web:7763a74cc042f231717e59"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        const studentNo = localStorage.getItem('studentNo');
+        if (!studentNo) window.location.href = 'login.html';
+
+        let currentClass = '', currentAid = '';
+
+        window.onload = () => loadAssignments();
+
+        async function loadAssignments() {
+            const listEl = document.getElementById('assignmentList');
+            listEl.innerHTML = '';
+            try {
+                const snap = await db.ref('classes').once('value');
+                const items = [];
+                snap.forEach(clsSnap => {
+                    const clsKey = clsSnap.key;
+                    const students = clsSnap.child('students').val() || {};
+                    if (!Object.values(students).some(stu => stu.studentNo === studentNo)) return;
+                    const className = clsSnap.child('name').val() || clsKey;
+                    const assignments = clsSnap.child('assignments').val() || {};
+                    Object.entries(assignments).forEach(([aid, asg]) => {
+                        // Check submission existence
+                        const submittedSnap = clsSnap.child('submissions').child(aid).child(studentNo);
+                        const submitted = submittedSnap.exists();
+                        items.push({ classId: clsKey, aid, className, name: asg.name, due: asg.dueDate, desc: asg.description || '', submitted });
+                    });
+                });
+                if (items.length === 0) {
+                    listEl.innerHTML = '<li>ยังไม่มีงานที่มอบหมาย</li>';
+                    return;
+                }
+                items.sort((a, b) => new Date(a.due) - new Date(b.due));
+                items.forEach(item => {
+                    const li = document.createElement('li');
+                    const actionButton = item.submitted
+                        ? '<span style="color:green;">ส่งแล้ว</span>'
+                        : `<button onclick="openModal('${item.classId}','${item.aid}')">ส่งงาน</button>`;
+                    li.innerHTML = `
+                        <strong>${item.className}</strong><br>
+                        ${item.name} <small>ส่งถึง: ${item.due ? new Date(item.due).toLocaleDateString('th-TH') : '-'}</small><br>
+                        <em>${item.desc}</em><br>
+                        ${actionButton}
+                    `;
+                    listEl.appendChild(li);
+                });
+            } catch (e) {
+                console.error(e);
+                listEl.innerHTML = '<li>โหลดงานไม่สำเร็จ</li>';
+            }
+        }
+
+        function openModal(cls, aid) {
+            currentClass = cls;
+            currentAid = aid;
+            document.getElementById('driveLinkInput').value = '';
+            document.getElementById('commentInput').value = '';
+            document.getElementById('submissionModal').style.display = 'flex';
+        }
+
+        function hideModal() {
+            document.getElementById('submissionModal').style.display = 'none';
+        }
+
+        function submitAssignment() {
+            const link = document.getElementById('driveLinkInput').value.trim();
+            if (!link) {
+                alert('กรุณากรอกลิงก์ Google Drive');
+                return;
+            }
+            const comment = document.getElementById('commentInput').value.trim();
+            const ref = db.ref(`classes/${currentClass}/submissions/${currentAid}/${studentNo}`);
+            ref.set({ driveLink: link, comment, submittedAt: new Date().toISOString() })
+                .then(() => {
+                    alert('ส่งงานเรียบร้อย');
+                    hideModal();
+                    loadAssignments();
+                })
+                .catch(() => alert('ส่งงานไม่สำเร็จ'));
+        }
+    </script>
+</body>
+</html>

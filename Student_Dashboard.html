@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - ระบบส่งงาน</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="classroom.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <button class="sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="สลับแถบข้าง">
+            <span class="material-icons">menu</span>
+        </button>
+        <div class="logo-section">
+            <span class="material-icons logo-icon">menu_book</span>
+            <span class="logo-text">ระบบจัดการชั้นเรียน</span>
+        </div>
+        <div class="user-info" id="userInfo">กำลังโหลดข้อมูล...</div>
+        <nav>
+            <ul>
+                <li><a href="student_dashboard.html" class="active"><span class="material-icons">dashboard</span><span class="menu-label">แดชบอร์ด</span></a></li>
+                <li><a href="student_assignments.html"><span class="material-icons">assignment</span><span class="menu-label">งานที่มอบหมาย</span></a></li>
+                <li><a href="grades.html"><span class="material-icons">grade</span><span class="menu-label">ผลการตรวจ</span></a></li>
+                <li><a href="profile.html"><span class="material-icons">person</span><span class="menu-label">โปรไฟล์</span></a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <header class="page-header">
+            <h1>แดชบอร์ดนักเรียน</h1>
+        </header>
+        <section class="dashboard-summary">
+            <div class="card">
+                <h3>ห้องเรียนของฉัน</h3>
+                <ul id="classList"><li>กำลังโหลด...</li></ul>
+            </div>
+            <div class="card">
+                <h3>งานที่มอบหมายทั้งหมด</h3>
+                <ul id="upcomingAssignments"><li>กำลังโหลด...</li></ul>
+            </div>
+            <div class="card">
+                <h3>ผลการตรวจล่าสุด</h3>
+                <ul id="recentGrades"><li>กำลังโหลด...</li></ul>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Sidebar toggle
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        }
+        
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCTyiR22AHeiKzI7Yr0g-V_dmdVPeh4ybo",
+            authDomain: "kru-digital.firebaseapp.com",
+            projectId: "kru-digital",
+            storageBucket: "kru-digital.firebasestorage.app",
+            messagingSenderId: "464969597852",
+            appId: "1:464969597852:web:7763a74cc042f231717e59"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Get chosen studentNo from login (stored in localStorage)
+        const studentNo = localStorage.getItem('studentNo');
+        if (!studentNo) window.location.href = 'login.html';
+
+        window.onload = () => {
+            loadUserInfo();
+            loadClasses();
+            loadUpcomingAssignments();
+            loadRecentGrades();
+        };
+
+        function loadUserInfo() {
+            db.ref('classes').once('value').then(snapshot => {
+                let profile = null;
+                snapshot.forEach(clsSnap => {
+                    const students = clsSnap.child('students').val() || {};
+                    Object.values(students).forEach(stu => {
+                        if (stu.studentNo === studentNo) profile = stu;
+                    });
+                });
+                const el = document.getElementById('userInfo');
+                if (profile) {
+                    el.textContent = `เลขที่ ${profile.studentNo} - ${profile.firstName} ${profile.lastName}`;
+                } else {
+                    el.textContent = 'นักเรียนไม่พบข้อมูล';
+                }
+            }).catch(() => {
+                document.getElementById('userInfo').textContent = 'เกิดข้อผิดพลาด';
+            });
+        }
+
+        function loadClasses() {
+            db.ref('classes').once('value').then(snapshot => {
+                const list = document.getElementById('classList');
+                list.innerHTML = '';
+                snapshot.forEach(clsSnap => {
+                    const students = clsSnap.child('students').val() || {};
+                    if (Object.values(students).some(stu => stu.studentNo === studentNo)) {
+                        const li = document.createElement('li');
+                        li.textContent = clsSnap.child('name').val();
+                        list.appendChild(li);
+                    }
+                });
+                if (!list.children.length) list.innerHTML = '<li>ยังไม่มีห้องเรียน</li>';
+            }).catch(() => {
+                document.getElementById('classList').innerHTML = '<li>โหลดไม่สำเร็จ</li>';
+            });
+        }
+
+        function loadUpcomingAssignments() {
+            const today = new Date();
+            db.ref('classes').once('value').then(snapshot => {
+                const items = [];
+                snapshot.forEach(clsSnap => {
+                    const students = clsSnap.child('students').val() || {};
+                    if (!Object.values(students).some(stu => stu.studentNo === studentNo)) return;
+                    const className = clsSnap.child('name').val();
+                    const assignments = clsSnap.child('assignments').val() || {};
+                    Object.values(assignments).forEach(asg => {
+                        const due = asg.dueDate ? new Date(asg.dueDate) : null;
+                        if (due && due >= today) {
+                            items.push({ className, name: asg.name, due });
+                        }
+                    });
+                });
+                items.sort((a, b) => a.due - b.due);
+                const ul = document.getElementById('upcomingAssignments');
+                ul.innerHTML = '';
+                if (!items.length) {
+                    ul.innerHTML = '<li>ยังไม่มีงานที่มอบหมาย</li>';
+                    return;
+                }
+                items.forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>${item.className}</strong>: ${item.name} <small>ส่งถึง ${item.due.toLocaleDateString('th-TH')}</small>`;
+                    ul.appendChild(li);
+                });
+            }).catch(() => {
+                document.getElementById('upcomingAssignments').innerHTML = '<li>โหลดไม่สำเร็จ</li>';
+            });
+        }
+
+        function loadRecentGrades() {
+            db.ref('classes').once('value').then(snapshot => {
+                const grades = [];
+                snapshot.forEach(clsSnap => {
+                    const students = clsSnap.child('students').val() || {};
+                    if (!Object.values(students).some(stu => stu.studentNo === studentNo)) return;
+                    const className = clsSnap.child('name').val();
+                    const assignments = clsSnap.child('assignments').val() || {};
+                    const gradesNode = clsSnap.child('grades').val() || {};
+                    Object.entries(assignments).forEach(([aid, asg]) => {
+                        const entry = gradesNode[aid] && gradesNode[aid][Object.keys(gradesNode[aid]).find(uid => gradesNode[aid][uid].score != null && students[uid]?.studentNo === studentNo)];
+                        if (entry) {
+                            grades.push({ className, name: asg.name, score: entry.score, date: new Date(entry.gradedAt) });
+                        }
+                    });
+                });
+                grades.sort((a, b) => b.date - a.date);
+                const ul = document.getElementById('recentGrades');
+                ul.innerHTML = '';
+                if (!grades.length) {
+                    ul.innerHTML = '<li>ยังไม่มีผลการตรวจ</li>';
+                    return;
+                }
+                grades.slice(0, 5).forEach(g => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>${g.className}</strong>: ${g.name} - ${g.score} คะแนน <small>${g.date.toLocaleDateString('th-TH')}</small>`;
+                    ul.appendChild(li);
+                });
+            }).catch(() => {
+                document.getElementById('recentGrades').innerHTML = '<li>โหลดไม่สำเร็จ</li>';
+            });
+        }
+    </script>
+</body>
+</html>

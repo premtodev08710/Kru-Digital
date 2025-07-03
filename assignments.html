@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>มอบหมายงาน - ระบบจัดการชั้นเรียน</title>
-  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="classroom.css">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -29,7 +29,6 @@
                 <li><a href="#" id="summaryLink"><span class="material-icons">bar_chart</span><span class="menu-label">คะแนนรวม</span></a></li>
             </ul>
         </nav>
-      
     </div>
 
     <div class="main-content">
@@ -44,6 +43,10 @@
                     <div>
                         <label for="assignmentMaxScore">คะแนนเต็ม:</label>
                         <input type="number" id="assignmentMaxScore" min="0" value="10" required>
+                    </div>
+                    <div>
+                        <label for="assignmentDueDate">กำหนดส่ง:</label>
+                        <input type="datetime-local" id="assignmentDueDate" required>
                     </div>
                 </div>
                 <button type="submit" class="add-assignment-button">เพิ่มงาน</button>
@@ -61,7 +64,7 @@
                     </thead>
                     <tbody id="scoreTableBody">
                         <tr>
-                            <td colspan="3" style="text-align: center; color: var(--light-text-color);">
+                            <td colspan="4" style="text-align: center; color: var(--light-text-color);">
                                 กำลังโหลดข้อมูลนักเรียนและงาน...
                             </td>
                         </tr>
@@ -72,12 +75,9 @@
     </div>
 
     <script>
-        // ===== Sidebar Collapse =====
         function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('collapsed');
+            document.getElementById('sidebar').classList.toggle('collapsed');
         }
-        // ===========================
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTyiR22AHeiKzI7Yr0g-V_dmdVPeh4ybo",
@@ -103,12 +103,11 @@
                 window.location.href = 'index.html';
                 return;
             }
-            // ปรับลิงก์ Sidebar
             document.getElementById('classLink').href = `class_management.html?class=${currentClassId}`;
             document.querySelector('.sidebar nav ul li a.active').href = `assignments.html?class=${currentClassId}`;
             document.getElementById('attendanceLink').href = `attendance.html?class=${currentClassId}`;
             document.getElementById('summaryLink').href = `summary.html?class=${currentClassId}`;
-            // โหลดข้อมูล
+
             loadAllData(currentClassId);
             document.getElementById('assignmentForm').addEventListener('submit', addAssignment);
         };
@@ -134,158 +133,120 @@
             headerRow.innerHTML = '';
             tableBody.innerHTML = '';
 
-            // 1) ชื่อนักเรียน
             const nameTh = document.createElement('th');
             nameTh.textContent = 'ชื่อนักเรียน';
             headerRow.appendChild(nameTh);
 
-            // 2) หัวงาน
             const sortedAssignmentIds = Object.keys(assignmentsData)
                 .sort((a, b) => new Date(assignmentsData[a].createdAt) - new Date(assignmentsData[b].createdAt));
-            sortedAssignmentIds.forEach(assignmentId => {
-                const assignment = assignmentsData[assignmentId];
+
+            sortedAssignmentIds.forEach(id => {
+                const asg = assignmentsData[id];
                 const th = document.createElement('th');
-                th.className = 'assignment-name-header';
                 th.innerHTML = `
-                    ${assignment.name}<br>(${assignment.maxScore} คะแนน)
-                    <span class="material-icons delete-assignment-icon"
-                        title="ลบงาน"
-                        onclick="deleteAssignment('${assignmentId}', event)">delete_forever</span>
+                    ${asg.name}<br>
+                    (${asg.maxScore} คะแนน)<br>
+                    <small>ส่งถึง: ${new Date(asg.dueDate).toLocaleString('th-TH')}</small>
+                    <span class="material-icons delete-assignment-icon" title="ลบงาน" onclick="deleteAssignment('${id}', event)">delete_forever</span>
                 `;
                 headerRow.appendChild(th);
             });
 
-            // 3) คะแนนพิเศษ
             const specialTh = document.createElement('th');
-            specialTh.className = 'assignment-name-header';
             specialTh.textContent = 'คะแนนพิเศษ';
             headerRow.appendChild(specialTh);
 
-            // 4) คะแนนรวม
             const totalTh = document.createElement('th');
-            totalTh.className = 'score-total-col';
             totalTh.textContent = 'คะแนนรวม';
             headerRow.appendChild(totalTh);
 
-            const sortedStudentIds = Object.keys(studentsData)
-                .sort((a, b) => {
-                    const noA = parseInt(studentsData[a].studentNo);
-                    const noB = parseInt(studentsData[b].studentNo);
-                    if (!isNaN(noA) && !isNaN(noB)) return noA - noB;
-                    return (studentsData[a].firstName||'').localeCompare(studentsData[b].firstName||'');
-                });
+            const students = Object.keys(studentsData)
+                .sort((a, b) => (studentsData[a].studentNo||'').localeCompare(studentsData[b].studentNo));
 
-            if (sortedStudentIds.length === 0) {
+            if (!students.length) {
                 tableBody.innerHTML = `<tr><td colspan="${sortedAssignmentIds.length+3}" style="text-align:center;color:var(--light-text-color);">ยังไม่มีนักเรียนในห้องเรียนนี้</td></tr>`;
                 return;
             }
 
-            sortedStudentIds.forEach(studentId => {
-                const student = studentsData[studentId];
-                if (!student) return;
+            students.forEach(sid => {
+                const student = studentsData[sid];
                 const row = tableBody.insertRow();
-                row.id = `studentRow-${studentId}`;
-
                 const nameCell = row.insertCell();
-                nameCell.className = 'student-name-col';
-                nameCell.textContent = `${student.firstName||''} ${student.lastName||''} (เลขที่ ${student.studentNo||'-'})`;
+                nameCell.textContent = `${student.firstName||''} ${student.lastName||''}`;
 
                 let total = 0;
-                // assignment scores
-                sortedAssignmentIds.forEach(assignmentId => {
+                sortedAssignmentIds.forEach(aid => {
                     const cell = row.insertCell();
-                    const curr = studentScores[studentId] && studentScores[studentId][assignmentId] != null
-                        ? studentScores[studentId][assignmentId] : '';
+                    const curr = studentScores[sid] && studentScores[sid][aid] != null ? studentScores[sid][aid] : '';
                     const input = document.createElement('input');
-                    input.type = 'number';
-                    input.min = '0';
-                    input.placeholder = '0';
-                    input.value = curr;
-                    input.dataset.studentId = studentId;
-                    input.dataset.assignmentId = assignmentId;
-                    input.dataset.maxScore = assignmentsData[assignmentId]?.maxScore || 0;
+                    input.type = 'number'; input.min = '0'; input.value = curr;
+                    input.dataset.studentId = sid; input.dataset.assignmentId = aid;
+                    input.dataset.maxScore = assignmentsData[aid]?.maxScore || 0;
                     input.addEventListener('change', updateScore);
-                    input.addEventListener('input', () => updateStudentTotalScoreDisplay(studentId));
+                    input.addEventListener('input', () => updateStudentTotalScoreDisplay(sid));
                     cell.appendChild(input);
-                    total += parseFloat(curr)||0;
+                    total += parseFloat(curr) || 0;
                 });
-                // special score
-                const specialCell = row.insertCell();
-                const sp = studentScores[studentId]?.specialScore != null
-                    ? studentScores[studentId].specialScore : '';
+
+                const spCell = row.insertCell();
+                const spVal = studentScores[sid]?.specialScore || '';
                 const spInput = document.createElement('input');
-                spInput.type = 'number';
-                spInput.min = '0';
-                spInput.placeholder = '0';
-                spInput.value = sp;
-                spInput.dataset.studentId = studentId;
-                spInput.dataset.assignmentId = 'specialScore';
+                spInput.type = 'number'; spInput.min = '0'; spInput.value = spVal;
+                spInput.dataset.studentId = sid; spInput.dataset.assignmentId = 'specialScore';
                 spInput.addEventListener('change', updateScore);
-                spInput.addEventListener('input', () => updateStudentTotalScoreDisplay(studentId));
-                specialCell.appendChild(spInput);
-                total += parseFloat(sp)||0;
+                spInput.addEventListener('input', () => updateStudentTotalScoreDisplay(sid));
+                spCell.appendChild(spInput);
+                total += parseFloat(spVal) || 0;
 
                 const totalCell = row.insertCell();
-                totalCell.className = 'score-total-col';
-                totalCell.id = `totalScoreDisplay-${studentId}`;
+                totalCell.id = `totalScoreDisplay-${sid}`;
                 totalCell.textContent = total;
             });
-        }
-
-        function updateScore(e) {
-            const inp = e.target;
-            const sid = inp.dataset.studentId;
-            const aid = inp.dataset.assignmentId;
-            let val = parseFloat(inp.value);
-            if (isNaN(val) || val < 0) val = 0;
-            if (aid !== 'specialScore') {
-                const max = parseFloat(inp.dataset.maxScore);
-                if (val > max) {
-                    alert(`คะแนนต้องไม่เกิน ${max}`);
-                    val = max;
-                }
-            }
-            inp.value = val;
-            db.ref(`classes/${currentClassId}/scores/${sid}/${aid}`).set(val)
-              .catch(()=>alert('เกิดข้อผิดพลาดในการบันทึกคะแนน'));
-        }
-
-        function updateStudentTotalScoreDisplay(studentId) {
-            let sum = 0;
-            const row = document.getElementById(`studentRow-${studentId}`);
-            if (!row) return;
-            row.querySelectorAll('input[type="number"]').forEach(i=>{
-                sum += parseFloat(i.value)||0;
-            });
-            document.getElementById(`totalScoreDisplay-${studentId}`).textContent = sum;
         }
 
         function addAssignment(e) {
             e.preventDefault();
             const name = document.getElementById('assignmentName').value.trim();
             const max = parseFloat(document.getElementById('assignmentMaxScore').value);
-            if (!name || isNaN(max) || max<=0) {
-                return alert('กรุณากรอกข้อมูลให้ถูกต้อง');
+            const due = document.getElementById('assignmentDueDate').value;
+            if (!name || isNaN(max) || !due) {
+                return alert('กรุณากรอกข้อมูลให้ครบถ้วน');
             }
             const ref = db.ref(`classes/${currentClassId}/assignments`).push();
-            ref.set({ name, maxScore: max, createdAt: new Date().toISOString() })
-              .then(()=> {
-                  alert('เพิ่มงานสำเร็จ!');
-                  document.getElementById('assignmentForm').reset();
-              })
-              .catch(()=>alert('เกิดข้อผิดพลาดในการเพิ่มงาน'));
+            ref.set({ name, maxScore: max, dueDate: new Date(due).toISOString(), createdAt: new Date().toISOString() })
+              .then(() => { alert('เพิ่มงานสำเร็จ!'); document.getElementById('assignmentForm').reset(); })
+              .catch(() => alert('เกิดข้อผิดพลาดในการเพิ่มงาน'));
         }
 
-        function deleteAssignment(assignmentId, event) {
-            event.stopPropagation();
-            if (!confirm('ต้องการลบงานนี้ใช่หรือไม่?')) return;
-            db.ref(`classes/${currentClassId}/assignments/${assignmentId}`).remove()
-              .then(()=>{
-                  Object.keys(studentsData).forEach(sid=>{
-                      db.ref(`classes/${currentClassId}/scores/${sid}/${assignmentId}`).remove();
+        function deleteAssignment(id, e) {
+            e.stopPropagation(); if (!confirm('ต้องการลบงานนี้?')) return;
+            db.ref(`classes/${currentClassId}/assignments/${id}`).remove()
+              .then(() => {
+                  Object.keys(studentsData).forEach(sid => {
+                      db.ref(`classes/${currentClassId}/scores/${sid}/${id}`).remove();
                   });
-              })
-              .catch(()=>alert('เกิดข้อผิดพลาดในการลบงาน'));
+              }).catch(() => alert('เกิดข้อผิดพลาดในการลบ'));
+        }
+
+        function updateScore(e) {
+            const inp = e.target; let val = parseFloat(inp.value) || 0;
+            if (inp.dataset.assignmentId !== 'specialScore') {
+                const max = parseFloat(inp.dataset.maxScore);
+                if (val > max) { alert(`คะแนนต้องไม่เกิน ${max}`); val = max; inp.value = val; }
+            }
+            db.ref(`classes/${currentClassId}/scores/${inp.dataset.studentId}/${inp.dataset.assignmentId}`).set(val)
+              .catch(() => alert('บันทึกคะแนนไม่สำเร็จ'));
+        }
+
+        function updateStudentTotalScoreDisplay(sid) {
+            let sum = 0;
+            document.querySelectorAll(`input[data-student-id='${sid}']`).forEach(i => {
+                sum += parseFloat(i.value) || 0;
+            });
+            const totalCell = document.getElementById(`totalScoreDisplay-${sid}`);
+            if (totalCell) {
+                totalCell.textContent = sum;
+            }
         }
     </script>
 </body>
