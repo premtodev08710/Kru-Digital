@@ -10,7 +10,6 @@
       href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
-     <link rel="stylesheet" href="classroom.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap&subset=thai"
       rel="stylesheet"
@@ -19,7 +18,8 @@
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet"
     />
-
+    <link rel="stylesheet" href="classroom.css">
+    
     <!-- ====== CSS หลัก (classroom.css) ====== -->
     <style>
       /* =======================
@@ -105,15 +105,12 @@
         text-align: center;
       }
 
-      /* ==== ส่วน “ใบเกรดราชการ” (Report Area) ==== */
+      /* ==== ส่วน "ใบเกรดราชการ" (Report Area) ==== */
       #reportArea {
         background-color: white;
         padding: 12px; /* ลด padding ลง */
-        /* border: 1px solid #000;  ลบกรอบออกตามที่ขอ */
         max-width: 800px;
         margin: 0 auto 20px; /* ลด margin บางส่วนเพื่อให้ PDF ชิดขึ้น */
-
-        /* ตั้งค่า Sarabun สำหรับข้อความทั้งหมดในรายงาน */
         font-family: "Sarabun", sans-serif;
       }
       /* Header ของใบเกรดราชการ */
@@ -217,38 +214,24 @@
     <!-- =======================
          SIDEBAR (คงเหมือนเดิมที่คุณใช้งาน)
          ======================= -->
-    <div class="sidebar" id="sidebar">
-      <button
-        class="sidebar-toggle-btn"
-        onclick="toggleSidebar()"
-        aria-label="สลับแถบข้าง"
-      >
-        <span class="material-icons">menu</span>
-      </button>
-      <div class="logo-section">
-        <span class="material-icons logo-icon">menu_book</span>
-        <span class="logo-text">ระบบจัดการชั้นเรียน</span>
-      </div>
-      <nav>
-        <ul>
-          <li>
-            <a href="index.html"><span class="material-icons">home</span>หน้าแรก</a>
-          </li>
-          <li>
-            <a href="#" id="classLink"><span class="material-icons">school</span>ห้องเรียน</a>
-          </li>
-          <li>
-            <a href="#" id="assignmentsLink"><span class="material-icons">assignment</span>มอบหมายงาน</a>
-          </li>
-          <li>
-            <a href="#" id="attendanceLink"><span class="material-icons">event_note</span>ข้อมูลการเข้าเรียน</a>
-          </li>
-          <li>
-            <a href="#" id="summaryLink" class="active"><span class="material-icons">bar_chart</span>คะแนนรวม</a>
-          </li>
-        </ul>
-      </nav>
-      
+     <div class="sidebar" id="sidebar">
+        <!-- Hamburger toggle button -->
+        <button class="sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="สลับแถบข้าง">
+            <span class="material-icons">menu</span>
+        </button>
+        <div class="logo-section">
+            <span class="material-icons logo-icon">menu_book</span>
+            <span class="logo-text">ระบบจัดการชั้นเรียน</span>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html"><span class="material-icons">home</span><span class="menu-label">หน้าแรก</span></a></li>
+                <li><a href="#" id="classLink"><span class="material-icons">school</span><span class="menu-label">ห้องเรียน</span></a></li>
+                <li><a href="#" id="assignmentsLink"><span class="material-icons">assignment</span><span class="menu-label">มอบหมายงาน</span></a></li>
+                <li><a href="#" id="attendanceLink"><span class="material-icons">event_note</span><span class="menu-label">ข้อมูลการเข้าเรียน</span></a></li>
+                <li><a href="#" class="active" id="summaryLink"><span class="material-icons">bar_chart</span><span class="menu-label">คะแนนรวม</span></a></li>
+            </ul>
+        </nav>
     </div>
 
     <!-- =======================
@@ -256,7 +239,7 @@
          ======================= -->
     <div class="main-content">
       <!-- =======================
-           ส่วน “ใบเกรดราชการ” (Report Area)
+           ส่วน "ใบเกรดราชการ" (Report Area)
            จะถูกซ่อนไว้ เพราะเราต้องการให้ผู้ใช้กดปุ่มแล้วจึงแปลงเป็น PDF
            ======================= -->
       <div id="reportArea" style="display: none;">
@@ -328,13 +311,11 @@
       </div>
 
       <!-- =======================
-           ส่วน “ตารางคะแนน” (Score Table) แบบเดิมที่คุณมีอยู่
-           ให้วางโค้ดตารางเดิมของคุณในนี้
-           ตัวอย่างโครงสร้างเว้นว่างไว้ก่อน ให้คุณดึงข้อมูลมาลงเอง
+           ส่วน "ตารางคะแนน" (Score Table) แบบเดิมที่คุณมีอยู่
            ======================= -->
       <div class="score-table-container">
         <h2>ตารางคะแนนงาน (รวมสัดส่วน)</h2>
-        <!-- ปุ่มดาวน์โหลด CSV แบบเดิมที่คุณมี (ถ้ามี) -->
+        <!-- ปุ่มดาวน์โหลด CSV -->
         <button id="btnDownloadExcel" class="btn-download" style="margin-bottom: 10px;">
           <span class="material-icons">file_download</span>
           ดาวน์โหลด Excel
@@ -357,7 +338,7 @@
       </div>
 
       <!-- =======================
-           ใต้ตารางคะแนน เพิ่มปุ่ม “ดาวน์โหลดใบเกรดราชการ (PDF)”
+           ใต้ตารางคะแนน เพิ่มปุ่ม "ดาวน์โหลดใบเกรดราชการ (PDF)"
            ======================= -->
       <div class="button-container">
         <button id="btnDownloadPdf" class="btn-download">
@@ -383,40 +364,44 @@
         apiKey: "AIzaSyCTyiR22AHeiKzI1Yr0g-V_dmdVPeh4ybo",
         authDomain: "kru-digital.firebaseapp.com",
         projectId: "kru-digital",
-        storageBucket: "kru-digital.firebasestorage.app",
+        storageBucket: "kru-digital.appspot.com",
         messagingSenderId: "464969597852",
         appId: "1:464969597852:web:7763a74cc042f231717e59",
       };
       if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
       }
+
       const db = firebase.database();
 
       // ====== 2. ตัวแปรเก็บข้อมูล ======
-      let classId = "";
+      let currentClassId = "";
       let studentsData = {};
       let assignmentsData = {};
       let studentScores = {};
       let attendanceDates = [];
+      let classData = {}; // เพิ่มตัวแปรเก็บข้อมูลห้องเรียน
 
       // ====== 3. เมื่อโหลด DOM เสร็จ ให้ตั้ง href เมนูและตั้ง listener ดึงข้อมูลจาก Firebase ======
       document.addEventListener("DOMContentLoaded", () => {
         // อ่าน ?class=XXX จาก URL
         const params = new URLSearchParams(window.location.search);
-        classId = params.get("class") || "";
-        if (!classId) {
+        currentClassId = params.get("class") || "";
+        if (!currentClassId) {
           alert("ไม่พบ Class ID กรุณาเรียกหน้านี้พร้อม ?class=รหัสห้องเรียน");
           return;
         }
 
-        // ตั้ง href ของแต่ละลิงก์ใน Sidebar โดยใช้ ID
-        document.getElementById("classLink").href = `class_management.html?class=${classId}`;
-        document.getElementById("assignmentsLink").href = `assignments.html?class=${classId}`;
-        document.getElementById("attendanceLink").href = `attendance.html?class=${classId}`;
-        document.getElementById("summaryLink").href = `summary.html?class=${classId}`;
+        setupSidebarLinks();
+
+        // Listener: class data
+        db.ref(`classes/${currentClassId}`).on("value", (snap) => {
+          classData = snap.val() || {};
+          buildReportArea(); // อัปเดตข้อมูลส่วนหัวเมื่อข้อมูลห้องเรียนเปลี่ยน
+        }, (err) => console.error(err));
 
         // Listener: students
-        db.ref(`classes/${classId}/students`).on(
+        db.ref(`classes/${currentClassId}/students`).on(
           "value",
           (snap) => {
             studentsData = snap.val() || {};
@@ -425,8 +410,9 @@
           },
           (err) => console.error(err)
         );
+        
         // Listener: assignments
-        db.ref(`classes/${classId}/assignments`).on(
+        db.ref(`classes/${currentClassId}/assignments`).on(
           "value",
           (snap) => {
             assignmentsData = snap.val() || {};
@@ -434,7 +420,7 @@
             Object.entries(assignmentsData).forEach(([aid, asg]) => {
               if (asg.weightScore == null) {
                 assignmentsData[aid].weightScore = asg.maxScore;
-                db.ref(`classes/${classId}/assignments/${aid}/weightScore`)
+                db.ref(`classes/${currentClassId}/assignments/${aid}/weightScore`)
                   .set(asg.maxScore)
                   .catch(console.error);
               }
@@ -444,8 +430,9 @@
           },
           (err) => console.error(err)
         );
+        
         // Listener: scores
-        db.ref(`classes/${classId}/scores`).on(
+        db.ref(`classes/${currentClassId}/scores`).on(
           "value",
           (snap) => {
             studentScores = snap.val() || {};
@@ -454,18 +441,32 @@
           },
           (err) => console.error(err)
         );
+        
         // Listener: attendance_dates
-        db.ref(`classes/${classId}/attendance_dates`).on(
+        db.ref(`classes/${currentClassId}/attendance_dates`).on(
           "value",
           (snap) => {
             attendanceDates = snap.val() || [];
-            attendanceDates.sort();
+            if (attendanceDates && attendanceDates.sort) {
+              attendanceDates.sort();
+            }
             renderScoreTable();
             buildReportArea();
           },
           (err) => console.error(err)
         );
+
+        // เพิ่ม Event Listener สำหรับปุ่มดาวน์โหลด Excel
+        document.getElementById('btnDownloadExcel').addEventListener('click', exportToExcel);
       });
+
+      // ---------- Sidebar Link Setup ----------
+      function setupSidebarLinks() {
+        document.getElementById("classLink").href = `class_management.html?class=${currentClassId}`;
+        document.getElementById("assignmentsLink").href = `assignments.html?class=${currentClassId}`;
+        document.getElementById("attendanceLink").href = `attendance.html?class=${currentClassId}`;
+        document.getElementById("summaryLink").href = `summary.html?class=${currentClassId}`;
+      }
 
       // ====== 4. ฟังก์ชัน renderScoreTable() ======
       function renderScoreTable() {
@@ -474,7 +475,7 @@
         headerRow.innerHTML = "";
         tableBody.innerHTML = "";
 
-        // 1) หัวตาราง “ชื่องาน” (ลบ head เดิม ถ้ามี) 
+        // 1) หัวตาราง "ชื่องาน" (ลบ head เดิม ถ้ามี) 
         const thNo = document.createElement("th");
         thNo.className = "no-cell";
         thNo.textContent = "ลำดับ";
@@ -485,9 +486,9 @@
         headerRow.appendChild(thName);
 
         // เรียง assignments ตาม createdAt
-        const sortedAssignmentIds = Object.keys(assignmentsData).sort((a, b) => {
-          const dA = new Date(assignmentsData[a].createdAt || 0);
-          const dB = new Date(assignmentsData[b].createdAt || 0);
+        const sortedAssignmentIds = Object.keys(assignmentsData || {}).sort((a, b) => {
+          const dA = new Date(assignmentsData[a]?.createdAt || 0);
+          const dB = new Date(assignmentsData[b]?.createdAt || 0);
           return dA - dB;
         });
 
@@ -516,33 +517,31 @@
           headerRow.appendChild(th);
         });
 
-        // เพิ่มคอลัมน์ “คะแนนพิเศษ”
+        // เพิ่มคอลัมน์ "คะแนนพิเศษ"
         const thSpecial = document.createElement("th");
         thSpecial.textContent = "คะแนนพิเศษ";
         headerRow.appendChild(thSpecial);
-        // เพิ่มคอลัมน์ “รวม (เต็ม 100)”
+        // เพิ่มคอลัมน์ "รวม (เต็ม 100)"
         const thTotal = document.createElement("th");
         thTotal.textContent = "รวม (100)";
         thTotal.className = "score-total-col";
         headerRow.appendChild(thTotal);
-        // เพิ่มคอลัมน์ “เกรด”
+        // เพิ่มคอลัมน์ "เกรด"
         const thGrade = document.createElement("th");
         thGrade.textContent = "เกรด";
         thGrade.className = "score-total-col";
         headerRow.appendChild(thGrade);
-        // เพิ่มคอลัมน์ “% เข้าเรียน”
+        // เพิ่มคอลัมน์ "% เข้าเรียน"
         const thAttend = document.createElement("th");
         thAttend.textContent = "% เข้าเรียน";
         headerRow.appendChild(thAttend);
 
         // ถ้าไม่มีนักเรียน
-        const sortedStudentIds = Object.keys(studentsData).sort((a, b) => {
-          const sa = studentsData[a],
-            sb = studentsData[b];
-          const na = parseInt(sa.studentNo),
-            nb = parseInt(sb.studentNo);
+        const sortedStudentIds = Object.keys(studentsData || {}).sort((a, b) => {
+          const sa = studentsData[a], sb = studentsData[b];
+          const na = parseInt(sa?.studentNo), nb = parseInt(sb?.studentNo);
           if (!isNaN(na) && !isNaN(nb)) return na - nb;
-          return (sa.firstName || "").localeCompare(sb.firstName || "");
+          return (sa?.firstName || "").localeCompare(sb?.firstName || "");
         });
         if (sortedStudentIds.length === 0) {
           tableBody.innerHTML = `
@@ -570,13 +569,15 @@
         let sumWeightAssignments = 0;
         sortedAssignmentIds.forEach((aid) => {
           sumWeightAssignments +=
-            parseFloat(assignmentsData[aid].weightScore) ||
-            assignmentsData[aid].maxScore;
+            parseFloat(assignmentsData[aid]?.weightScore) ||
+            assignmentsData[aid]?.maxScore || 0;
         });
 
         // สร้างแต่ละแถว
         sortedStudentIds.forEach((sid, index) => {
           const stu = studentsData[sid];
+          if (!stu) return;
+          
           const row = document.createElement("tr");
           row.id = `studentRow-${sid}`;
 
@@ -597,6 +598,8 @@
           let sumAdjusted = 0;
           sortedAssignmentIds.forEach((aid) => {
             const asg = assignmentsData[aid];
+            if (!asg) return;
+            
             const maxScore = parseFloat(asg.maxScore) || 0;
             const weightScore = parseFloat(asg.weightScore) || maxScore;
             const raw =
@@ -648,8 +651,8 @@
           tdGrade.className = "score-total-col";
           row.appendChild(tdGrade);
 
-          // 7) % เข้าเรียน (สมมติให้ 100% เสมอ ถ้าไม่มี data จริงให้ปรับเอง)
-          let attendPercent = 100;
+          // 7) % เข้าเรียน (คำนวณจากข้อมูล attendance)
+          let attendPercent = calculateAttendancePercentage(sid);
           const tdAttend = document.createElement("td");
           tdAttend.textContent = attendPercent.toFixed(0);
           row.appendChild(tdAttend);
@@ -672,7 +675,27 @@
         return "0";
       }
 
-      // ====== 6. ฟังก์ชัน attachWeightListeners() ======
+      // ====== 6. ฟังก์ชัน calculateAttendancePercentage ======
+      function calculateAttendancePercentage(studentId) {
+        if (!attendanceDates || attendanceDates.length === 0) return 100;
+        
+        let presentCount = 0;
+        let totalDays = attendanceDates.length;
+        
+        attendanceDates.forEach(date => {
+          const attendance = classData.attendance && classData.attendance[date];
+          if (attendance && attendance[studentId]) {
+            const status = attendance[studentId];
+            if (status === "present" || status === "late") {
+              presentCount++;
+            }
+          }
+        });
+        
+        return (presentCount / totalDays) * 100;
+      }
+
+      // ====== 7. ฟังก์ชัน attachWeightListeners() ======
       function attachWeightListeners() {
         document.querySelectorAll(".weight-input").forEach((input) => {
           input.addEventListener("change", (e) => {
@@ -682,7 +705,7 @@
             e.target.value = val;
 
             // บันทึกลง Firebase แล้ว render ใหม่ทั้งตาราง + ใบเกรดราชการ
-            db.ref(`classes/${classId}/assignments/${aid}/weightScore`)
+            db.ref(`classes/${currentClassId}/assignments/${aid}/weightScore`)
               .set(val)
               .then(() => {
                 renderScoreTable();    // ตารางคะแนนต้นทาง
@@ -696,13 +719,13 @@
         });
       }
 
-      // ====== 7. ฟังก์ชัน buildReportArea() ======
+      // ====== 8. ฟังก์ชัน buildReportArea() ======
       function buildReportArea() {
         if (
-          Object.keys(studentsData).length === 0 &&
-          Object.keys(assignmentsData).length === 0 &&
-          Object.keys(studentScores).length === 0 &&
-          attendanceDates.length === 0
+          Object.keys(studentsData || {}).length === 0 &&
+          Object.keys(assignmentsData || {}).length === 0 &&
+          Object.keys(studentScores || {}).length === 0 &&
+          (attendanceDates || []).length === 0
         ) {
           return;
         }
@@ -710,13 +733,13 @@
         const container = document.getElementById("reportArea");
         container.style.display = "block"; // เปิดให้เราใช้ html2pdf ดึงไปแปลง
 
-        // 1) กรอกข้อมูลใต้ Header 
-        document.getElementById("displaySemester").textContent = "2/2566";
-        document.getElementById("displayGradeLevel").textContent = "ปวช.2";
-        document.getElementById("displaySubject").textContent = "ภาษาไทยพื้นฐาน";
-        document.getElementById("displayTeacher").textContent = "นายสมชาย ใจดี";
-        document.getElementById("displayProgram").textContent = "ปวช.2 การบัญชี";
-        document.getElementById("displaySubjectCode").textContent = "57220101";
+        // 1) กรอกข้อมูล Header จากข้อมูลห้องเรียน
+        document.getElementById("displaySemester").textContent = "1/2568"; // ตั้งค่าเริ่มต้นหรือดึงจากข้อมูล
+        document.getElementById("displayGradeLevel").textContent = classData.level || "–";
+        document.getElementById("displaySubject").textContent = classData.name || "–";
+        document.getElementById("displayTeacher").textContent = classData.bandId || "–";
+        document.getElementById("displayProgram").textContent = classData.level ? `${classData.level} ${classData.description || ""}` : "–";
+        document.getElementById("displaySubjectCode").textContent = "–"; // ใส่รหัสวิชาจริงถ้ามีในข้อมูล
 
         // 2) เติมตาราง <table class="grade-table" id="gradeTable"> ใหม่หมด
         const thead = document.querySelector("#gradeTable thead tr");
@@ -739,13 +762,14 @@
         thName.textContent = "ชื่อ–สกุล";
         thead.appendChild(thName);
 
-        const sortedAssignmentIds = Object.keys(assignmentsData).sort((a, b) => {
-          const dA = new Date(assignmentsData[a].createdAt || 0);
-          const dB = new Date(assignmentsData[b].createdAt || 0);
+        const sortedAssignmentIds = Object.keys(assignmentsData || {}).sort((a, b) => {
+          const dA = new Date(assignmentsData[a]?.createdAt || 0);
+          const dB = new Date(assignmentsData[b]?.createdAt || 0);
           return dA - dB;
         });
         sortedAssignmentIds.forEach((aid) => {
           const asg = assignmentsData[aid];
+          if (!asg) return;
           const weight = parseFloat(asg.weightScore) || asg.maxScore;
           const th = document.createElement("th");
           th.textContent = `${asg.name} (เต็ม ${weight})`;
@@ -771,13 +795,11 @@
         thead.appendChild(thAttend);
 
         // 2.2) ถ้าไม่มีนักเรียน
-        const sortedStudentIds = Object.keys(studentsData).sort((a, b) => {
-          const sa = studentsData[a],
-            sb = studentsData[b];
-          const na = parseInt(sa.studentNo),
-            nb = parseInt(sb.studentNo);
+        const sortedStudentIds = Object.keys(studentsData || {}).sort((a, b) => {
+          const sa = studentsData[a], sb = studentsData[b];
+          const na = parseInt(sa?.studentNo), nb = parseInt(sb?.studentNo);
           if (!isNaN(na) && !isNaN(nb)) return na - nb;
-          return (sa.firstName || "").localeCompare(sb.firstName || "");
+          return (sa?.firstName || "").localeCompare(sb?.firstName || "");
         });
         if (sortedStudentIds.length === 0) {
           tbody.innerHTML = `
@@ -803,8 +825,8 @@
         let sumWeightAssignments = 0;
         sortedAssignmentIds.forEach((aid) => {
           sumWeightAssignments +=
-            parseFloat(assignmentsData[aid].weightScore) ||
-            assignmentsData[aid].maxScore;
+            parseFloat(assignmentsData[aid]?.weightScore) ||
+            assignmentsData[aid]?.maxScore || 0;
         });
 
         // นับผ่าน/ไม่ผ่าน เพื่อสรุป
@@ -814,6 +836,8 @@
         // 2.3) สร้างแถวนักเรียนทีละคน
         sortedStudentIds.forEach((sid, idx) => {
           const stu = studentsData[sid];
+          if (!stu) return;
+          
           const tr = document.createElement("tr");
 
           const tdNo = document.createElement("td");
@@ -835,6 +859,8 @@
           let sumAdjusted = 0;
           sortedAssignmentIds.forEach((aid) => {
             const asg = assignmentsData[aid];
+            if (!asg) return;
+            
             const maxScore = parseFloat(asg.maxScore) || 0;
             const weightScore = parseFloat(asg.weightScore) || maxScore;
             const raw =
@@ -876,8 +902,10 @@
             passedCount++;
           }
 
+          // % เข้าเรียน
+          const attendPercent = calculateAttendancePercentage(sid);
           const tdAttend = document.createElement("td");
-          tdAttend.textContent = "100";
+          tdAttend.textContent = attendPercent.toFixed(0);
           tr.appendChild(tdAttend);
 
           tbody.appendChild(tr);
@@ -890,7 +918,108 @@
         document.getElementById("totalCount").textContent = `${totalCount} คน`;
       }
 
-      // ====== 8. เมื่อคลิก “ดาวน์โหลดใบเกรดราชการ (PDF)” ======
+      // ====== 9. ฟังก์ชัน exportToExcel() ======
+      function exportToExcel() {
+        // สร้างข้อมูล CSV
+        let csvContent = "ลำดับ,เลขประจำตัว,ชื่อ-สกุล,";
+        
+        // เพิ่มหัวคอลัมน์ของงาน
+        const sortedAssignmentIds = Object.keys(assignmentsData || {}).sort((a, b) => {
+          const dA = new Date(assignmentsData[a]?.createdAt || 0);
+          const dB = new Date(assignmentsData[b]?.createdAt || 0);
+          return dA - dB;
+        });
+        
+        sortedAssignmentIds.forEach(aid => {
+          const asg = assignmentsData[aid];
+          if (!asg) return;
+          csvContent += `${asg.name} (เต็ม ${asg.weightScore || asg.maxScore}),`;
+        });
+        
+        // เพิ่มคอลัมน์พิเศษ
+        csvContent += "คะแนนพิเศษ,รวม (100),เกรด,% เข้าเรียน\n";
+        
+        // เพิ่มข้อมูลนักเรียน
+        const sortedStudentIds = Object.keys(studentsData || {}).sort((a, b) => {
+          const sa = studentsData[a], sb = studentsData[b];
+          const na = parseInt(sa?.studentNo), nb = parseInt(sb?.studentNo);
+          if (!isNaN(na) && !isNaN(nb)) return na - nb;
+          return (sa?.firstName || "").localeCompare(sb?.firstName || "");
+        });
+        
+        // คำนวณ maxSpecialAll และ sumWeightAssignments
+        let maxSpecialAll = 0;
+        sortedStudentIds.forEach(sid => {
+          const rawSp = studentScores[sid] && studentScores[sid].specialScore != null 
+            ? parseFloat(studentScores[sid].specialScore) 
+            : 0;
+          if (rawSp > maxSpecialAll) maxSpecialAll = rawSp;
+        });
+        
+        let sumWeightAssignments = 0;
+        sortedAssignmentIds.forEach(aid => {
+          sumWeightAssignments += parseFloat(assignmentsData[aid]?.weightScore) || assignmentsData[aid]?.maxScore || 0;
+        });
+        
+        sortedStudentIds.forEach((sid, index) => {
+          const stu = studentsData[sid];
+          if (!stu) return;
+          
+          csvContent += `${index + 1},${stu.studentNo || "-"},"${stu.firstName || ""} ${stu.lastName || ""}",`;
+          
+          let sumAdjusted = 0;
+          
+          // คะแนนแต่ละงาน
+          sortedAssignmentIds.forEach(aid => {
+            const asg = assignmentsData[aid];
+            if (!asg) return;
+            
+            const maxScore = parseFloat(asg.maxScore) || 0;
+            const weightScore = parseFloat(asg.weightScore) || maxScore;
+            const raw = studentScores[sid] && studentScores[sid][aid] != null 
+              ? parseFloat(studentScores[sid][aid]) 
+              : 0;
+            const safeRaw = raw > maxScore ? maxScore : raw;
+            const adj = maxScore > 0 ? safeRaw * (weightScore / maxScore) : 0;
+            sumAdjusted += adj;
+            
+            csvContent += `${adj.toFixed(2)},`;
+          });
+        
+          // คะแนนพิเศษ
+          const rawSp = studentScores[sid] && studentScores[sid].specialScore != null 
+            ? parseFloat(studentScores[sid].specialScore) 
+            : 0;
+          const safeSp = rawSp > maxSpecialAll ? maxSpecialAll : rawSp;
+          sumAdjusted += safeSp;
+          csvContent += `${safeSp.toFixed(2)},`;
+          
+          // คะแนนรวม
+          const denom = sumWeightAssignments + maxSpecialAll;
+          const normalized = denom > 0 ? (sumAdjusted / denom) * 100 : 0;
+          const clamped = normalized > 100 ? 100 : normalized;
+          csvContent += `${clamped.toFixed(2)},`;
+          
+          // เกรด
+          csvContent += `${calculateGrade(clamped)},`;
+          
+          // % เข้าเรียน
+          const attendPercent = calculateAttendancePercentage(sid);
+          csvContent += `${attendPercent.toFixed(0)}\n`;
+        });
+        
+        // สร้างไฟล์และดาวน์โหลด
+        const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `คะแนนนักเรียน_${currentClassId}_${new Date().toISOString().slice(0, 10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      // ====== 10. เมื่อคลิก "ดาวน์โหลดใบเกรดราชการ (PDF)" ======
       document.getElementById("btnDownloadPdf").addEventListener("click", () => {
         buildReportArea();
 
@@ -901,7 +1030,7 @@
         }
         const opt = {
           margin: 0.2,         // ขอบ PDF ลดลง
-          filename: `ใบเกรด_${new Date().toISOString().slice(0, 10)}.pdf`,
+          filename: `ใบเกรด_${classData.name || 'รายงาน'}_${new Date().toISOString().slice(0, 10)}.pdf`,
           image: { type: "jpeg", quality: 0.98 },
           html2canvas: { scale: 2, useCORS: true },
           jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
@@ -909,7 +1038,7 @@
         html2pdf().set(opt).from(element).save();
       });
 
-      // ====== 9. ฟังก์ชัน toggleSidebar() (คงเดิม) ======
+      // ====== 11. ฟังก์ชัน toggleSidebar() (คงเดิม) ======
       function toggleSidebar() {
         document.getElementById("sidebar").classList.toggle("collapsed");
       }
